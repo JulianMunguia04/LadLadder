@@ -1,0 +1,55 @@
+body{
+  margin:0px;
+  padding: 0px;
+  height: 100%;
+}
+nav{
+  background-color: black;
+  color:white;
+  margin:0px;
+  height: 50px;
+}
+
+main{
+  display: flex;
+  flex-direction: row;
+  height: calc(100vh - 150px);
+  background-color:#858585;
+}
+aside{
+  background-color:#858585;
+  width: 45%;
+  display:flex;
+  flex-direction: column;
+  align-items:center;
+  justify-content: center;
+}
+.home-buttons{
+  background-color:#ebe9e5; 
+  color: black;
+  height: 20vh;
+  width: 80%;
+  margin: 60px;
+}
+.home-buttons:hover{
+  color: red;
+}
+.home-buttons:active{
+  background-color:red;
+  color:black;
+}
+article{
+  background-color: #858585;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+#logo{
+  height: 350px;
+}
+footer{
+  height: 100px;
+  background-color: black;
+  color:white;
+}

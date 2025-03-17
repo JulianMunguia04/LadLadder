@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="styles.css">
+  <title>Lad Ladder</title>
+</head>
+<body>
+  <nav>
+    Nav
+  </nav>
+  <main>
+    <aside>
+      <button class="home-buttons" id="create-game">
+        Create Game
+      </button>
+      <button class="home-buttons" id="join-game">
+        Join Game
+      </button>
+    </aside>
+    <article>
+      <img id=logo src="ladladderlogo.png">
+    </article>
+  </main>
+  <footer>
+    Gaem Tiem
+  </footer>
+  <script>
+    const createGameButton = document.getElementById("create-game");
+    createGameButton.addEventListener("click", ()=>{
+      window.location.href= "/host"
+    })
+  </script>
+</body>
+</html>
