@@ -76,7 +76,7 @@ app.get("/join/:roomCode", async (req,res) =>{
   try {
     const currentRoom = await Room.findOne({ room: roomCode });
     
-    if (currentRoom && currentRoom.admin) {
+    if (currentRoom && currentRoom.admin && currentRoom.players.length < 8) {
       currentRoom.admin = roomCode;
       await currentRoom.save();
       res.render("player", { roomCode: roomCode });
@@ -110,10 +110,11 @@ io.on("connection", (socket) => {
       try {
         const currentRoom = await Room.findOne({ room: roomCode });
         if (currentRoom && currentRoom.players.length < 8){
-          const newPlayer = await createNewPlayer(socket.id, roomCode, name);
+          const newPlayer = await createNewPlayer(socket.id, roomCode, name, currentRoom.players.length + 1);
           await newPlayer.save()
           currentRoom.players.push(newPlayer._id);
           await currentRoom.save()
+          socket.to(roomCode).emit("player-join", { name: newPlayer.name, playerNumber: newPlayer.playerNumber });
         }else {
           console.log(`Room ${roomCode} is full or doesn't exist`);
         }
@@ -216,7 +217,7 @@ async function createNewRoom() {
   return roomCode;
 }
 
-async function createNewPlayer(socketid, room, name){
+async function createNewPlayer(socketid, room, name, playerNumber){
     const newPlayer = new Players({
       arts: 0,
       athleticism: 0,
@@ -233,7 +234,7 @@ async function createNewPlayer(socketid, room, name){
       room: room,
       answer: [],
       modesty: 0,
-      playerNumber: 0,
+      playerNumber: playerNumber,
       name: name,
   });
   try{

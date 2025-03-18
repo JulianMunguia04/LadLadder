@@ -14,6 +14,12 @@ joinGameButton.addEventListener("click", () => {
   if (name) {
     // Emit the identify event with the player's name
     socket.emit('identify', role, roomCode, name);
+    const namePhase = document.getElementById("name-phase");
+    namePhase.classList.add(`displayNone`);
+    const playerDiv = document.createElement("div");
+    playerDiv.textContent = roomCode;
+    const main = document.getElementById("main")
+    main.appendChild(playerDiv);
   } else {
     alert("Please enter your name before joining the game.");
   }
