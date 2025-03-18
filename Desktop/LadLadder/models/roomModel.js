@@ -5,7 +5,8 @@ const roomSchema = new mongoose.Schema({
   questions: Array,
   room: String,
   question: Number,
-  admin: String
+  admin: String,
+  gameStarted: Boolean,
 }, { collection: 'rooms' })
 
 module.exports = mongoose.model("Rooms", roomSchema)

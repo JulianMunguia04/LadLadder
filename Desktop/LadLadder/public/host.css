@@ -98,3 +98,15 @@ h1{
 .player-8{
   background-color: pink;
 }
+
+.displayNone{
+  display: none !important;
+}
+
+#start-game{
+  background-color:#ebe9e5; 
+  color: black;
+  height: 5vh;
+  width: 20%;
+  margin: 60px;
+}

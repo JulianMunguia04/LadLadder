@@ -96,39 +96,63 @@ app.get("/join", (req,res)=>{
 
 io.on("connection", (socket) => {
   console.log(`User connected: ${socket.id}`);
-  //identify host Socket
-  socket.on('identify', async (role, roomCode, name)=>{
+
+  // Handle identify event (for both host and player)
+  socket.on('identify', async (role, roomCode, name) => {
     socket.role = role;
     socket.roomCode = roomCode;
     socket.name = name;
-    if (role === 'host'){
-      socket.join(roomCode)
-      console.log(roomCode + " " + role + " connected")
-    }
-    else if(role === 'player'){
-      socket.join(roomCode)
+
+    if (role === 'host') {
+      // Host joining the room
+      socket.join(roomCode);
+      console.log(`${roomCode} ${role} connected`);
+    } else if (role === 'player') {
+      // Player joining the room
+      socket.join(roomCode);
       try {
         const currentRoom = await Room.findOne({ room: roomCode });
-        if (currentRoom && currentRoom.players.length < 8){
+
+        if (currentRoom && currentRoom.players.length < 8) {
           const newPlayer = await createNewPlayer(socket.id, roomCode, name, currentRoom.players.length + 1);
-          await newPlayer.save()
+          await newPlayer.save();
           currentRoom.players.push(newPlayer._id);
-          await currentRoom.save()
+          await currentRoom.save();
+
           socket.to(roomCode).emit("player-join", { name: newPlayer.name, playerNumber: newPlayer.playerNumber });
-        }else {
+
+          if (currentRoom.players.length >= 3) {
+            console.log("Enough players");
+            socket.to(roomCode).emit("min-players");
+          }
+        } else {
           console.log(`Room ${roomCode} is full or doesn't exist`);
         }
-      }
-      catch (error){
+      } catch (error) {
         console.error('Error adding player to room:', error);
       }
     }
-  })
+  });
 
-  //Delete game if admin disconnects
+  // Handle game join event (simply log for now)
+  socket.on("start-game", async () => {
+    try {
+      const currentRoom = await Room.findOne({ room: socket.roomCode });
+      currentRoom.gameStarted = true;
+      currentRoom.save();
+      socket.to(socket.roomCode).emit("start-game")   //start-game to players
+      socket.emit("start-game")                       //start-game to host
+    } catch (error){
+      console.log(error)
+    }
+  });
+
+  // Handle disconnect event (delete game if host disconnects)
   socket.on('disconnect', async () => {
     const { roomCode, role } = socket;
+    
     if (role === 'host') {
+      // Host disconnects, delete the room
       try {
         const result = await Room.deleteOne({ room: roomCode });
 
@@ -136,35 +160,31 @@ io.on("connection", (socket) => {
           console.log('Room not found or already deleted');
         } else {
           console.log(`Room with code ${roomCode} deleted.`);
-
           io.emit('user-disconnected', roomCode, role);
         }
       } catch (error) {
         console.error('Error deleting room:', error);
       }
-    }else if (role === 'player') {
-      // Player disconnection logic
+    } else if (role === 'player') {
+      // Player disconnects, remove them from the room
       try {
-        // Find the player document using their socket.id
         const player = await Players.findOne({ socket: socket.id });
-  
+
         if (player) {
-          // Find the room
           const currentRoom = await Room.findOne({ room: roomCode });
-  
+
           if (currentRoom) {
-            // Remove the player's ObjectId from the room's players array
             currentRoom.players = currentRoom.players.filter(
               (playerId) => playerId.toString() !== player._id.toString()
             );
             await currentRoom.save();
             console.log(`Player ${player._id} removed from room ${roomCode}`);
-  
+
             // Optionally, delete the player document from the Players collection
             await Players.deleteOne({ _id: player._id });
             console.log(`Player ${player._id} deleted from database`);
-  
-            // Emit an event to notify other clients that a player has disconnected
+
+            // Notify other clients that a player has disconnected
             io.to(roomCode).emit('player-disconnected', { playerId: player._id, roomCode });
           } else {
             console.log(`Room ${roomCode} not found`);
@@ -206,7 +226,8 @@ async function createNewRoom() {
     questions: [],
     room: roomCode.toString(),
     question: 0,
-    admin: ''
+    admin: '',
+    gameStarted: false,
   });
   try{
     await newRoom.save();

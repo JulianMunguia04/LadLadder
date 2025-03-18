@@ -4,12 +4,28 @@ const socket = io()
 const role = 'host';
 const roomCode = window.location.pathname.split('/')[2];
 
+const joinButton = document.getElementById('start-game');
+
 socket.on("player-join", (data) => {
   console.log(`Player joined: ${data.name} (Player ${data.playerNumber})`);
   addPlayer(data.name, data.playerNumber); // Add the player to the UI
 });
 
+socket.on("min-players", ()=>{
+  addJoinButton()
+  console.log("enough players")
+})
+
+socket.on("start-game", ()=>{
+  console.log("game-started")
+})
+
 socket.emit('identify', role, roomCode);
+
+//Button Functions
+joinButton.addEventListener("click", ()=>{
+  startGame();
+})
 
 //joining
 function addPlayer(playerName,playerNumber) {
@@ -18,4 +34,13 @@ function addPlayer(playerName,playerNumber) {
   playerDiv.classList.add(`player-${playerNumber}`);
   playerDiv.textContent = playerName;
   playersContainer.appendChild(playerDiv);
+}
+
+function addJoinButton(){
+  const joinButton = document.getElementById('start-game');
+  joinButton.classList.remove(`displayNone`)
+}
+
+function startGame(){
+  socket.emit("start-game", role, roomCode)
 }
