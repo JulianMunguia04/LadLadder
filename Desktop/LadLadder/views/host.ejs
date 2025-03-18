@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="/styles.css">
+  <link rel="stylesheet" href="/host.css">
 
   <script src="/socket.io/socket.io.js"></script>
   <script src="/js/socketHostClient.js" defer></script>
@@ -14,7 +14,23 @@
     Nav
   </nav>
   <main>
-    <%=roomCode%>
+    <h1>
+      Waiting For Players Room: <%=roomCode%>...
+    </h1>
+    <div id="players-container">
+      <div class="player">
+        Orest
+      </div>
+      <div class="player">
+        Roman
+      </div>
+      <div class="player">
+        Jayden
+      </div>
+      <div class="player">
+        Kiev
+      </div>
+    </div>
   </main>
   <footer>
   </footer>

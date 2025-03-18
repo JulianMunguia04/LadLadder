@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="/styles.css">
+  <link rel="stylesheet" href="/player.css">
   <title>Lad Ladder</title>
 
   <script src="/socket.io/socket.io.js"></script>
@@ -14,7 +14,11 @@
     Nav
   </nav>
   <main>
-    <%=roomCode%>
+    <h1>Enter your Name</h1>
+    <div class="container"> 
+      <input class="name-input" id="playerName" type="text">
+      <button class="join-button" id="join-button">Join</button>
+    </div>
   </main>
   <footer>
   </footer>
