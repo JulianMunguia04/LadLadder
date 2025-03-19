@@ -16,8 +16,8 @@ socket.on("min-players", ()=>{
   console.log("enough players")
 })
 
-socket.on("start-game", ()=>{
-  console.log("game-started")
+socket.on("start-game", (playersCount)=>{
+  questionPhase(playersCount)
 })
 
 socket.emit('identify', role, roomCode);
@@ -42,5 +42,15 @@ function addJoinButton(){
 }
 
 function startGame(){
-  socket.emit("start-game", role, roomCode)
+  socket.emit("start-game", roomCode)
+}
+
+function questionPhase(playerCount){
+  const joinPhase = document.getElementById("join-phase")
+  joinPhase.classList.add(`displayNone`)
+  const promptingPhase = document.getElementById("prompting-phase")
+  promptingPhase.classList.remove("displayNone")
+
+  const questionsCount = document.getElementById("questions-count")
+  questionsCount.textContent = `0/${playerCount}`
 }

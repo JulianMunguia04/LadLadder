@@ -6,6 +6,7 @@ const mongoose = require('mongoose')
 
 const Room = require('./models/roomModel');
 const Players = require('./models/playerModel');
+const Questions = require('./models/questionModel');
 
 const uri = "mongodb://localhost:27017/ladladder";
 
@@ -135,17 +136,29 @@ io.on("connection", (socket) => {
   });
 
   // Handle game join event (simply log for now)
-  socket.on("start-game", async () => {
+  socket.on("start-game", async (roomCode) => {
     try {
       const currentRoom = await Room.findOne({ room: socket.roomCode });
       currentRoom.gameStarted = true;
       currentRoom.save();
       socket.to(socket.roomCode).emit("start-game")   //start-game to players
-      socket.emit("start-game")                       //start-game to host
+      socket.emit("start-game", currentRoom.players.length)                //start-game to host
     } catch (error){
       console.log(error)
     }
   });
+
+  socket.on("player-question", async (attributes, positive, question, roomCode)=>{
+    try {
+      const newQuestion = await createNewQuestion(attributes, positive, question, roomCode)
+      newQuestion.save()
+      const currentRoom = await Room.findOne({ room: roomCode });
+      currentRoom.questions.push(newQuestion._id)
+      currentRoom.save()
+    } catch(error){
+      console.log(error) 
+    }
+  })
 
   // Handle disconnect event (delete game if host disconnects)
   socket.on('disconnect', async () => {
@@ -228,6 +241,7 @@ async function createNewRoom() {
     question: 0,
     admin: '',
     gameStarted: false,
+    currentAnswers: [],
   });
   try{
     await newRoom.save();
@@ -265,4 +279,20 @@ async function createNewPlayer(socketid, room, name, playerNumber){
     console.error('Error adding Player', error)
   }
   return newPlayer;
+}
+
+async function createNewQuestion(attributes, positive, question, roomCode){
+  const newQuestion = new Questions({
+    attributes: attributes,
+    positive: positive,
+    question: question,
+    room: roomCode
+  })
+  try{
+    await newQuestion.save();
+    console.log("Question added");
+    return newQuestion;
+  }catch(error){
+    console.error('Error Question not added', error)
+  }
 }

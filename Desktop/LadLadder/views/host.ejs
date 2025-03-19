@@ -14,12 +14,18 @@
     Nav
   </nav>
   <main>
-    <h1>
-      Waiting For Players Room: <%=roomCode%>...
-    </h1>
-    <div id="players-container">
+    <div id="join-phase">
+      <h1>
+        Waiting For Players Room: <%=roomCode%>...
+      </h1>
+      <div id="players-container">
+      </div>
+      <button id="start-game" class="displayNone">Start Game</button>
     </div>
-    <button id="start-game" class="displayNone">Start Game</button>
+    <div id="prompting-phase" class="displayNone">
+      <h1> Write your own question on your device</h1>
+      <div id="questions-count"></div>
+    </div>
   </main>
   <footer>
   </footer>
