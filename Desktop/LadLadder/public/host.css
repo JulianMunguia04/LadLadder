@@ -132,3 +132,7 @@ h1{
   align-items:center;
   justify-content:center;
 }
+
+#answers-count{
+  text-align: center;
+}

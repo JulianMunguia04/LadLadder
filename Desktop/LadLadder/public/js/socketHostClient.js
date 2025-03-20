@@ -6,8 +6,13 @@ const roomCode = window.location.pathname.split('/')[2];
 
 const joinButton = document.getElementById('start-game');
 
+socket.on("ranked-answer-submitted", (answerCount, playersCount)=>{
+  const answersCount = document.getElementById("answers-count")
+  answersCount.innerHTML = `${answerCount}/${playersCount}`
+})
+
 socket.on("answer-question", (question, allPlayers)=>{
-  rankPhase(question)
+  rankPhase(question, allPlayers.length)
   console.log(question, allPlayers)
 })
 
@@ -65,11 +70,13 @@ function questionPhase(playerCount){
   questionsCount.textContent = `0/${playerCount}`
 }
 
-function rankPhase(question){
+function rankPhase(question, playersCount){
   const promptingPhase = document.getElementById("prompting-phase")
   promptingPhase.classList.add("displayNone")
   const rankPhase = document.getElementById("rank-phase")
   rankPhase.classList.remove("displayNone")
   const questionH1 = document.getElementById("rank-question")
   questionH1.innerText = question
+  const answersCount = document.getElementById("answers-count")
+  answersCount.innerHTML = `0/${playersCount}`
 }

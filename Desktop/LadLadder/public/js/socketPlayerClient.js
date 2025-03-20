@@ -2,6 +2,11 @@ const socket = io("http://localhost:5000");
 
 const role = 'player';
 const roomCode = window.location.pathname.split('/')[2];
+let playerId;
+socket.on("get-playerId", (id)=>{
+  playerId = id 
+  console.log(playerId)
+})
 
 socket.on("answer-question", (question, allPlayers)=>{
   answeringPhase()
@@ -113,8 +118,10 @@ function populatePlayers(playersEach) {
   const playersContainer = document.getElementById('players-container');
 
   playersEach.forEach(player => {
+    console.log(player)
     const playerDiv = document.createElement('div');
     playerDiv.classList.add('player-item');
+    playerDiv.classList.add(`player-${player.playerNumber}`);
     playerDiv.setAttribute('draggable', 'true');
     playerDiv.setAttribute('data-id', player._id);
     playerDiv.textContent = player.name;
@@ -158,8 +165,10 @@ document.getElementById('submit-ranking').addEventListener('click', function() {
   playerElements.forEach(playerElement => {
     const playerId = playerElement.dataset.id;
     const playerName = playerElement.textContent;
-    rankedPlayers.push({ _id: playerId, name: playerName });
+    rankedPlayers.push(playerId);
   });
-  // Log the new order of players
-  console.log(rankedPlayers);
+  // Emit new players to the server
+  socket.emit("ranked-answer-submit", roomCode, playerId,rankedPlayers)
+  const rankPhase = document.getElementById("rank-phase")
+  rankPhase.classList.add("displayNone")
 });

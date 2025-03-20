@@ -119,6 +119,7 @@ io.on("connection", (socket) => {
           await newPlayer.save();
           currentRoom.players.push(newPlayer._id);
           await currentRoom.save();
+          socket.emit("get-playerId", newPlayer._id)
 
           socket.to(roomCode).emit("player-join", { name: newPlayer.name, playerNumber: newPlayer.playerNumber });
 
@@ -161,13 +162,30 @@ io.on("connection", (socket) => {
         let currentQuestionId = currentRoom.questions[0]._id
         let currentQuestion = await Questions.findOne({ _id: currentQuestionId });
         let playerIds = currentRoom.players
-        let allPlayers = await Players.find({ '_id': { $in: playerIds } }).select('_id name')
-
+        let allPlayers = await Players.find({ '_id': { $in: playerIds } }).select('_id name playerNumber')
+        console.log(allPlayers) 
         socket.to(socket.roomCode).emit("answer-question", currentQuestion.question, allPlayers)//start-game players
         socket.emit("answer-question", currentQuestion.question, allPlayers)
       }
     } catch(error){
       console.log(error) 
+    }
+  })
+
+  socket.on("ranked-answer-submit", async (roomCode, playerId,rankedPlayers)=>{
+    try{
+      const currentRoom = await Room.findOne({ room: roomCode });
+      currentRoom.currentAnswers.push(rankedPlayers)
+      currentRoom.save()
+      const currentPlayer = await Players.findOne({_id: playerId})
+      currentPlayer.answer = rankedPlayers
+      currentPlayer.save()
+      socket.to(roomCode).emit("ranked-answer-submitted", currentRoom.currentAnswers.length, currentRoom.players.length)
+      if (currentRoom.currentAnswers.length == currentRoom.players.length){
+        console.log("show Results")
+      }
+    }catch(error){
+      console.log("error-submitting-answer")
     }
   })
 
