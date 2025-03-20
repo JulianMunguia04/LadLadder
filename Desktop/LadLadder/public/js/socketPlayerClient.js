@@ -3,6 +3,12 @@ const socket = io("http://localhost:5000");
 const role = 'player';
 const roomCode = window.location.pathname.split('/')[2];
 
+socket.on("answer-question", (question, allPlayers)=>{
+  answeringPhase()
+  renderAnswerQuestion(question)
+  populatePlayers(allPlayers)
+})
+
 socket.on("connect", () => {
   console.log("Connected to Socket.io server with ID:", socket.id);
 });
@@ -87,3 +93,73 @@ sendQuestion.addEventListener("click", ()=>{
     promptPhase.classList.add("displayNone")
   }
 })
+
+
+//Answering Phase
+
+function answeringPhase(){
+  const promptPhase = document.getElementById("prompt-phase");
+  promptPhase.classList.add("displayNone")
+  const answerPhase = document.getElementById("rank-phase");
+  answerPhase.classList.remove("displayNone")
+}
+
+function renderAnswerQuestion(question){
+  const rankQuestion = document.getElementById("rank-question")
+  rankQuestion.innerText = question
+}
+
+function populatePlayers(playersEach) {
+  const playersContainer = document.getElementById('players-container');
+
+  playersEach.forEach(player => {
+    const playerDiv = document.createElement('div');
+    playerDiv.classList.add('player-item');
+    playerDiv.setAttribute('draggable', 'true');
+    playerDiv.setAttribute('data-id', player._id);
+    playerDiv.textContent = player.name;
+
+    playerDiv.addEventListener('dragstart', handleDragStart);
+    playerDiv.addEventListener('dragend', handleDragEnd);
+
+    playersContainer.appendChild(playerDiv);
+  });
+}
+
+function handleDragStart(event) {
+  event.dataTransfer.setData("text/plain", event.target.dataset.id);
+  event.target.classList.add('dragging');
+}
+
+function handleDragEnd(event) {
+  event.target.classList.remove('dragging');
+}
+
+// Allow drop in ranking section
+function allowDrop(event) {
+  event.preventDefault();
+}
+
+// Handle drop event
+function drop(event) {
+  event.preventDefault();
+  const playerId = event.dataTransfer.getData("text/plain");
+  const draggedPlayer = document.querySelector(`[data-id="${playerId}"]`);
+  const rankingSection = document.getElementById('ranking-section');
+  rankingSection.appendChild(draggedPlayer);
+}
+
+document.getElementById('submit-ranking').addEventListener('click', function() {
+  const rankingSection = document.getElementById('ranking-section');
+  const rankedPlayers = [];
+
+  // Get the players in the drop section in their new order
+  const playerElements = rankingSection.querySelectorAll('.player-item');
+  playerElements.forEach(playerElement => {
+    const playerId = playerElement.dataset.id;
+    const playerName = playerElement.textContent;
+    rankedPlayers.push({ _id: playerId, name: playerName });
+  });
+  // Log the new order of players
+  console.log(rankedPlayers);
+});

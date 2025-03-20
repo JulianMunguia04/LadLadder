@@ -155,6 +155,17 @@ io.on("connection", (socket) => {
       const currentRoom = await Room.findOne({ room: roomCode });
       currentRoom.questions.push(newQuestion._id)
       currentRoom.save()
+      if (currentRoom.questions.length < currentRoom.players.length){
+        socket.to(socket.roomCode).emit("player-question", currentRoom.questions.length, currentRoom.players.length)
+      }else{
+        let currentQuestionId = currentRoom.questions[0]._id
+        let currentQuestion = await Questions.findOne({ _id: currentQuestionId });
+        let playerIds = currentRoom.players
+        let allPlayers = await Players.find({ '_id': { $in: playerIds } }).select('_id name')
+
+        socket.to(socket.roomCode).emit("answer-question", currentQuestion.question, allPlayers)//start-game players
+        socket.emit("answer-question", currentQuestion.question, allPlayers)
+      }
     } catch(error){
       console.log(error) 
     }

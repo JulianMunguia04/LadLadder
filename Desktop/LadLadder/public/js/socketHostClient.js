@@ -6,6 +6,16 @@ const roomCode = window.location.pathname.split('/')[2];
 
 const joinButton = document.getElementById('start-game');
 
+socket.on("answer-question", (question, allPlayers)=>{
+  rankPhase(question)
+  console.log(question, allPlayers)
+})
+
+socket.on("player-question", (questionCount, playerCount)=>{
+  const questionsCount = document.getElementById("questions-count")
+  questionsCount.textContent = `${questionCount}/${playerCount}`
+})
+
 socket.on("player-join", (data) => {
   console.log(`Player joined: ${data.name} (Player ${data.playerNumber})`);
   addPlayer(data.name, data.playerNumber); // Add the player to the UI
@@ -53,4 +63,13 @@ function questionPhase(playerCount){
 
   const questionsCount = document.getElementById("questions-count")
   questionsCount.textContent = `0/${playerCount}`
+}
+
+function rankPhase(question){
+  const promptingPhase = document.getElementById("prompting-phase")
+  promptingPhase.classList.add("displayNone")
+  const rankPhase = document.getElementById("rank-phase")
+  rankPhase.classList.remove("displayNone")
+  const questionH1 = document.getElementById("rank-question")
+  questionH1.innerText = question
 }

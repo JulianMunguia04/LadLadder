@@ -21,7 +21,7 @@
         <button class="join-button" id="join-button">Join</button>
       </div>
     </div>
-    <div id="prompt-phase"  class="displayNone">
+    <div id="prompt-phase" class="displayNone">
       <h1>Write your own Question:</h1>
       <div class="input-option-flex">
         <input id = "question-input">
@@ -42,6 +42,16 @@
       <button id="send-question">
         Done
       </button>
+    </div>
+    <div id="rank-phase" class="displayNone">
+      <h1 id="rank-question">Answer The Following Question</h1>
+      <h3>Low ----------------- High</h3>
+      <div id="ranking-section" class="ranking-section" ondrop="drop(event)" ondragover="allowDrop(event)">
+      </div>
+      <div id="players-container" class="players-list">
+        <!-- This section will be populated dynamically with player data -->
+      </div>
+      <button id="submit-ranking">Submit Ranking</button>
     </div>
   </main>
   <footer>
