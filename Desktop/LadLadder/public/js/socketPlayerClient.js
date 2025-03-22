@@ -22,6 +22,10 @@ socket.on("start-game", ()=>{
   questionPhase()
 })
 
+socket.on("ranked-results",(rankedResults)=>{
+  console.log(rankedResults)
+})
+
 const joinGameButton = document.getElementById("join-button");
 joinGameButton.addEventListener("click", () => {
   const name = document.getElementById("playerName").value;

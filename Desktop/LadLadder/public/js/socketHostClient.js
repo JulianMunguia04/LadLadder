@@ -35,6 +35,10 @@ socket.on("start-game", (playersCount)=>{
   questionPhase(playersCount)
 })
 
+socket.on("ranked-results",(rankedResults)=>{
+  console.log(rankedResults)
+})
+
 socket.emit('identify', role, roomCode);
 
 //Button Functions

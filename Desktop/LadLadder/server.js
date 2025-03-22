@@ -183,6 +183,10 @@ io.on("connection", (socket) => {
       socket.to(roomCode).emit("ranked-answer-submitted", currentRoom.currentAnswers.length, currentRoom.players.length)
       if (currentRoom.currentAnswers.length == currentRoom.players.length){
         console.log("show Results")
+        const playerAvgRanking = await processAnswers(roomCode)
+        const rankedResults = await Players.find({ '_id': { $in: playerAvgRanking } }).select('_id name playerNumber')
+        socket.to(roomCode).emit("ranked-results", rankedResults)
+        socket.emit("ranked-results", rankedResults)
       }
     }catch(error){
       console.log("error-submitting-answer")
@@ -323,5 +327,57 @@ async function createNewQuestion(attributes, positive, question, roomCode){
     return newQuestion;
   }catch(error){
     console.error('Error Question not added', error)
+  }
+}
+
+async function processAnswers(roomCode) {
+  try {
+    const currentRoom = await Room.findOne({ room: roomCode });
+    if (!currentRoom || !currentRoom.players || !currentRoom.currentAnswers) {
+      throw new Error("Invalid room data or missing players/answers");
+    }
+
+    const players = currentRoom.players;
+    const currentAnswers = currentRoom.currentAnswers;
+
+    console.log("Players:", players);
+    console.log("Current Answers:", currentAnswers);
+
+    const playersAsStrings = players.map((player) => player.toString());
+    const currentAnswersAsStrings = currentAnswers.map((answer) =>
+      answer.map((id) => id.toString())
+    );
+
+    console.log("Players as Strings:", playersAsStrings);
+    console.log("Current Answers as Strings:", currentAnswersAsStrings);
+
+    const transposedRankings = playersAsStrings.map((player, playerIndex) => {
+      return currentAnswersAsStrings.map((answer) => {
+        const rank = answer.indexOf(playersAsStrings[playerIndex]) + 1;
+        return rank;
+      });
+    });
+
+    console.log("Transposed Rankings:", transposedRankings);
+
+    const averageRankings = transposedRankings.map((playerRankings) => {
+      const sum = playerRankings.reduce((acc, rank) => acc + rank, 0);
+      const average = sum / playerRankings.length;
+      return average;
+    });
+
+    console.log("Average Rankings:", averageRankings);
+
+    const sortedPlayers = averageRankings
+      .map((rank, index) => ({ player: players[index], rank }))
+      .sort((a, b) => a.rank - b.rank) 
+      .map((item) => item.player);
+
+    console.log("Sorted Players:", sortedPlayers);
+
+    return sortedPlayers;
+  } catch (error) {
+    console.log(error);
+    throw error;
   }
 }
