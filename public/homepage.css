@@ -1,0 +1,173 @@
+body {
+  height: 100vh;
+  width: 100vw;
+  margin: 0;
+  padding: 0;
+  background: radial-gradient(circle, rgb(53, 53, 53) 0%, rgb(22, 22, 22) 100%);
+  position:relative;
+  overflow: hidden; /* This prevents scrolling */
+}
+
+header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  margin: 0;
+  padding: 0;
+  z-index: 1000;
+}
+
+#curtains {
+  width: 100.5%;       /* Force full width of header */
+  height: 22vh;      /* Set any custom height (will stretch) */
+  object-fit: fill;   /* Ignore aspect ratio (distort image) */
+  display: block;
+  position: absolute;
+  top: -0.6vh;
+  left: -0.2vw;
+}
+
+footer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  background-color: red; /* Example color */
+  text-align: center;
+  height: 10vh;
+  z-index: 1000;
+}
+
+#seats{
+  position: absolute;
+  bottom: -8vh;
+  left: -8vw;
+  width: 115%;
+  height: 35vh;
+}
+
+#stage{
+  position: absolute;
+  right: -8vw;
+  bottom: 12vh;
+  width: 55vw;
+  height: 40vh;
+}
+
+#logo{
+  position: absolute;
+  z-index: 3000;
+  right:2vw;
+  top: 50%;           /* Move down by 50% of parent height */
+  transform: translateY(calc(-50% - 5vh)); /* Pull back up by 50% of own height */
+  width: 48%;
+  animation: logo 2s infinite;
+}
+
+@keyframes logo{
+  0%{
+    transform: translateY(calc(-50% - 5vh));
+  }
+  25%{
+    transform: translateY(calc(-50% - 5vh)) rotate(-15deg)
+  }
+  50%{
+    transform: translateY(calc(-50% - 5vh)) rotate(15deg);
+  }
+  75%{
+    transform: translateY(calc(-50% - 5vh)) scale(100%);
+  }
+  90%{
+    transform: translateY(calc(-50% - 5vh)) scale(70%);
+  }
+  100%{
+    transform: translateY(calc(-50% - 5vh));
+  }
+}
+
+#create-game{
+  position:absolute;
+  cursor:pointer;
+  z-index: 3000;
+  background:none;
+  border:none;
+  left: 10vw;
+  top: 1vh;
+}
+
+#create-game img{
+  position:absolute;
+  width: 20vw;
+  animation: pulse 1s infinite;
+}
+
+#join-game{
+  position:absolute;
+  cursor:pointer;
+  z-index: 3000;
+  background:none;
+  border:none;
+  left: 10vw;
+  top:45vh;
+}
+
+#join-game img{
+  position:absolute;
+  width: 20vw;
+  animation: pulse 1s infinite;
+  animation-delay: 0.5s
+}
+
+@keyframes pulse{
+  0%{
+    transform: scale(100%);
+  }
+  50%{
+    transform: scale(102%);
+  }
+  100%{
+    transform: scale(100%);
+  }
+}
+
+#fullscreen-canvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 9999;
+  pointer-events: none;
+}
+
+#div-icons{
+  position: absolute;
+  display: flex;
+  bottom: 1vh;
+  right: 13vh;
+  z-index: 2000;
+  height: 4vh;
+  backdrop-filter:blur(20px);
+  border-color:white;
+  border-width: 1px;
+  border:solid;
+  border-radius: 7px;
+  padding: 1vh;
+  justify-content: space-between;
+  gap: 10px;
+}
+#div-icons img{
+  margin: 0px 1vw;
+}
+
+#gaem-tiem-logo{
+  position:absolute;
+  z-index: 2001;
+  top: 1vh;
+  right: 1vh;
+  width: 5vw;
+}
+
+
+

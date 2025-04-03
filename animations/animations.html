@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <link rel="stylesheet" href="animations.css">
+</head>
+<body>
+  <canvas id="fullscreen-canvas">
+</body>
+<script>
+  const canvas = document.getElementById("fullscreen-canvas");
+  const ctx = canvas.getContext("2d");
+
+  let mouseX = window.innerWidth / 2;
+  let mouseY = window.innerHeight / 2;
+  let spotlightX = mouseX;
+  let spotlightY = mouseY;
+  const radius = 100;
+  const lerpFactor = 0.1; // Adjust for smoother/slower movement
+
+  function resizeCanvas() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    draw();
+  }
+
+  function draw() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    // Draw semi-transparent black background
+    ctx.fillStyle = "rgba(0, 0, 0, 0.5)";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    // Apply lerping for smooth delayed motion
+    spotlightX += (mouseX - spotlightX) * lerpFactor;
+    spotlightY += (mouseY - spotlightY) * lerpFactor;
+
+    // Create a radial gradient for the yellow spotlight
+    const gradient = ctx.createRadialGradient(spotlightX, spotlightY, 30, spotlightX, spotlightY, radius);
+    gradient.addColorStop(0, "rgba(255, 255, 0, 0.8)"); // Bright yellow in center
+    gradient.addColorStop(0.7, "rgba(255, 255, 0, 0.2)"); // Softer yellow fade
+    gradient.addColorStop(1, "rgba(255, 255, 0, 0)");   // Fully transparent at edges
+
+    ctx.fillStyle = gradient;
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    requestAnimationFrame(draw); // Keep updating animation
+  }
+
+  window.addEventListener("mousemove", (event) => {
+    mouseX = event.clientX;
+    mouseY = event.clientY;
+  });
+
+  window.addEventListener("resize", resizeCanvas);
+  resizeCanvas();
+</script>
+
+</html>

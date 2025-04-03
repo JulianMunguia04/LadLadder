@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="homepage.css">
+  <script src="homepage.js" defer></script>
+  <title>Lad Ladder</title>
+</head>
+<body>
+  <header>
+    <img id="curtains" src="./images/curtains.png">
+  </header>
+  <canvas id="fullscreen-canvas"></canvas>
+  <button id="create-game">
+    <img id="create-game-image" src="./images/create-game/1.png">
+  </button>
+  <button id="join-game">
+    <img id="join-game-image" src="./images/join-game/1.png">
+  </button>
+  <img id="logo" src = "./images/ladladderlogo.png">
+  <main>
+    <img id="stage" src="./images/stage.png">
+  </main>
+  <footer>
+    <img id="gaem-tiem-logo" src="gaemtiem-logo.png">
+    <div id="div-icons">
+      <img id="twitter-icon" src="./images/twitter-icon.png">
+      <img id="discord-icon" src="./images/discord-icon.png">
+      <img id="instagram-icon" src="./images/instagram-icon.png">
+    </div>
+    <img id="seats" src="./images/seats-footer.png">
+  </footer>
+</body>
+<script>
+  const createGameButton = document.getElementById("create-game");
+  createGameButton.addEventListener("click", ()=>{
+    window.location.href= "/host"
+  })
+  const joinGameButton = document.getElementById("join-game");
+  joinGameButton.addEventListener("click", ()=>{
+    window.location.href= "/join"
+  })
+</script>
+</html>

@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="/host.css">
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="/js/socketHostClient.js" defer></script>
+  <title>Lad Ladder</title>
+</head>
+<body>
+  <nav>
+    Nav
+  </nav>
+  <main>
+    <div id="join-phase">
+      <h1>
+        Waiting For Players Room: <%=roomCode%>...
+      </h1>
+      <div id="players-container">
+      </div>
+      <button id="start-game" class="displayNone">Start Game</button>
+    </div>
+    <div id="prompting-phase" class="displayNone">
+      <h1> Write your own question on your device</h1>
+      <div id="questions-count"></div>
+    </div>
+    <div id="rank-phase" class="displayNone">
+      <h1 id ="rank-question"></h1>
+      <div id="answers-count"></div>
+    </div>
+    <div id="results-phase" class="displayNone">
+      <h1 id="question-header">
+        
+      </h1>
+      <div id="players-results-container">
+
+      </div>
+      <button id="next-question">Next Question</button>
+    </div>
+    <div id="awards-phase" class="displayNone">
+      <h1 id="awards-header">
+
+      </h1>
+      <div id="awards-points">
+
+      </div>
+      <div id="awarded-player" class="player">
+
+      </div>
+    </div>
+    <div id="final-results" class="displayNone">
+      <h1>
+        Final Results
+      </h1>
+      <div id="final-container">
+
+      </div>
+      <button onclick="window.location.href='/host';" id="new-game" style="margin-top: 2%">New Game</button>
+    </div>
+  </main>
+  <footer>
+  </footer>
+</body>
+</html>
