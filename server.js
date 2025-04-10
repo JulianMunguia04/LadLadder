@@ -122,7 +122,7 @@ io.on("connection", (socket) => {
       try {
         const currentRoom = await Room.findOne({ room: roomCode });
 
-        if (currentRoom && currentRoom.players.length < 8) {
+        if (currentRoom && currentRoom.players.length < 8 && !currentRoom.gameStarted) {
           const newPlayer = await createNewPlayer(socket.id, roomCode, name, currentRoom.players.length + 1);
           await newPlayer.save();
           currentRoom.players.push(newPlayer._id);
@@ -139,6 +139,7 @@ io.on("connection", (socket) => {
           }
         } else {
           console.log(`Room ${roomCode} is full or doesn't exist`);
+          socket.emit("room-access-failed")
         }
       } catch (error) {
         console.error('Error adding player to room:', error);

@@ -21,6 +21,11 @@ socket.on("answer-question", (question, allPlayers)=>{
   populatePlayers(allPlayers)
 })
 
+socket.on("room-access-failed", ()=>{
+  console.log("Room full, or already started")
+  window.location.href = '/';
+})
+
 socket.on("connect", () => {
   console.log("Connected to Socket.io server with ID:", socket.id);
 });

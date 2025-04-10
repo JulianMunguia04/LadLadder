@@ -4,12 +4,13 @@
   "main": "server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "devStart": "node server.js"
+    "devStart": "node server.js",
+    "start": "node server.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "description": "",
+  "description": "Lad Ladder",
   "dependencies": {
     "dotenv": "^16.4.7",
     "ejs": "^3.1.10",
