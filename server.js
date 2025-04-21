@@ -359,18 +359,24 @@ server.listen(PORT, "0.0.0.0",() => {
   console.log(`Server running at http://localhost:${PORT}`);
 });
 
-async function generateRoomCode (){
+async function generateRoomCode () {
+  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
   let code;
   let isCodeUnique = false;
-  while (!isCodeUnique){
-    code = Math.floor(1000000000 + Math.random() * 9000000000);
+
+  while (!isCodeUnique) {
+    code = '';
+    for (let i = 0; i < 5; i++) {
+      code += characters.charAt(Math.floor(Math.random() * characters.length));
+    }
 
     const existingRoom = await Room.findOne({ room: code });
-    
+
     if (!existingRoom) {
-    isCodeUnique = true;
+      isCodeUnique = true;
     }
   }
+
   return code;
 }
 

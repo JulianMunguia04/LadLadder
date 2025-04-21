@@ -168,6 +168,14 @@ footer {
   border: solid rgb(110, 110, 110) 4px;
   color: rgb(110, 110, 110);
   font-size: 3vh;
+  transition: 0.15s;
+}
+
+.host-controls:hover{
+  border-width: 8px;
+  font-weight: bold;
+  color: white;
+  background-color: rgb(110, 110, 110);
 }
 
 
