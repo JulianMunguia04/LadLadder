@@ -1,0 +1,173 @@
+body {
+  height: 100vh;
+  width: 100vw;
+  margin: 0;
+  padding: 0;
+  background: radial-gradient(circle, rgb(53, 53, 53) 0%, rgb(22, 22, 22) 100%);
+  position:relative;
+  overflow: hidden; /* This prevents scrolling */
+}
+
+.display-none{
+  display:none;
+}
+
+header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  margin: 0;
+  padding: 0;
+  z-index: 1000;
+}
+
+#curtains {
+  width: 100.5%;       /* Force full width of header */
+  height: 22vh;      /* Set any custom height (will stretch) */
+  object-fit: fill;   /* Ignore aspect ratio (distort image) */
+  display: block;
+  position: absolute;
+  top: -0.6vh;
+  left: -0.2vw;
+}
+
+footer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  text-align: center;
+  height: 10vh;
+  z-index: 1000;
+}
+
+#seats{
+  position: absolute;
+  bottom: -8vh;
+  left: -8vw;
+  width: 115%;
+  height: 35vh;
+}
+
+#join-stage{
+  position: absolute;
+  right: -8vw;
+  bottom: -18vh;
+  width: 110vw;
+  height: 80vh;
+  z-index: 1;
+}
+#join-curtains{
+  position: absolute;
+  left: -1vw;
+  width: 80vw;
+  height: 77vh;
+  z-index: 2;
+}
+
+#gaem-tiem-logo{
+  position:absolute;
+  z-index: 2001;
+  top: 1vh;
+  right: 1vh;
+  width: 5vw;
+}
+
+#waiting{
+  position:absolute;
+  color: white;
+  font-size: 5.75vw;
+  top: 2vw;
+  left: 22vw;
+  z-index: 2000;
+  margin:0px;
+  padding:0px;
+}
+
+#join-code{
+  position:absolute;
+  border: solid black;
+  backdrop-filter:blur(15px);
+  text-align: center;
+  font-size: 3vw;
+  color: white;
+  right: 1vh;
+  top: 1vh;
+  z-index: 2000;
+  padding: 1vh 5vh;
+  border-radius: 1vh;
+}
+
+#join-link{
+  color: white;
+  transition: color 0.15s;
+}
+
+#join-link:hover{
+  color: rgb(101, 212, 249);
+  text-decoration: underline;
+}
+
+#players-join-container{
+  position:absolute;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  top: 45vh;
+  z-index: 1000;
+  padding: 1vh;
+  display:flex;
+  gap: 2.6vh;
+}
+
+.player{
+  height: 20vh;
+  width: 20vh;
+  text-align: center;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  border: solid black 0.4vh;
+  border-radius: 1vh;
+  font-size: 3vh;
+}
+.player-1{
+  background-color: red;
+}
+.player-2{
+  background-color: blue;
+}
+.player-3{
+  background-color: yellow;
+}
+.player-4{
+  background-color: green;
+}
+.player-5{
+  background-color: orange;
+}
+.player-6{
+  background-color: violet;
+}
+.player-7{
+  background-color: turquoise;
+}
+.player-8{
+  background-color: pink;
+}
+
+.host-controls{
+  position: absolute;
+  z-index: 3000;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  top: 80vh;
+  width: 20vw;
+  height: 10vh;
+  border-radius: 5vh;
+  border: solid rgb(110, 110, 110) 4px;
+  color: rgb(110, 110, 110);
+  font-size: 3vh;
+}
+
+

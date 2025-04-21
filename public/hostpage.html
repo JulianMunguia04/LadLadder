@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="hostpage.css">
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.2.4/howler.min.js"></script>
+  <script src="./js/hostSocketClient.js" defer></script>
+  <title>Lad Ladder</title>
+</head>
+<body>
+  <h1 id="waiting"> Waiting For Players</h1>
+  <div id="join-code">
+    <a id="join-link">Room Code:</a>
+    <div id="room-code">XDWM</div>
+  </div>
+
+  <header>
+    <img id="curtains" src="./images/curtains.png">
+  </header>
+  <main>
+    <div id="players-join-container">
+    </div>
+    <button class="host-controls display-none" id="start-game">Start Game</button>
+    <img id="join-curtains" src="./images/join-curtains.png">
+    <img id="join-stage" src="./images/join-stage.png">
+  </main>
+  <footer>
+    <img id="gaem-tiem-logo" src="gaemtiem-logo.png">
+  </footer>
+</body>
+<script>
+  const waiting = document.getElementById("waiting")
+  let waitingFrame = 0;
+  function waitingAnimation() {
+    if (waitingFrame === 0) {
+      waiting.innerText = "Waiting For Players";
+    } else if (waitingFrame === 1) {
+      waiting.innerText = "Waiting For Players.";
+    } else if (waitingFrame === 2) {
+      waiting.innerText = "Waiting For Players..";
+    } else if (waitingFrame === 3) {
+      waiting.innerText = "Waiting For Players...";
+    }
+
+    waitingFrame = (waitingFrame + 1) % 4;
+  }
+  setInterval(waitingAnimation,400)
+</script>
+</html>
