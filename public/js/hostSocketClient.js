@@ -22,9 +22,16 @@ const connectSound = new Howl({
   volume: 0.5,
 })
 
+const crowdCheerSound = new Howl({
+  src: ['./sound-effects/crowd-cheering.mp3'],
+  volume: 0.15,
+})
+
 crowdIndoorSound.play();
 
 //join Phase
+const joinPhase = document.querySelector(".join-phase")
+const joinPhaseHeader = document.getElementById("join-phase-header")
 const startButton = document.getElementById('start-game');
 const playersJoinContainer = document.getElementById("players-join-container");
 
@@ -65,3 +72,108 @@ document.addEventListener('DOMContentLoaded', () => {
   renderStartingPlayers(players);
 });
 
+startButton.addEventListener("click", ()=>{
+  playIntro()
+  setTimeout(() => {
+    unRenderAll()
+    promptingPhaseRender(2)
+  }, 2000);
+  setTimeout(() => {
+    cheerAndQuiet(3000)
+  }, 2000);
+  quietAudience(3000);
+})
+
+const animationDuration = 6000
+function playIntro(){
+  const div = document.createElement('div');
+  div.id = 'logo-transition';
+
+  const img = document.createElement('img');
+  img.src = './images/ladladderlogo.png'; 
+
+  div.appendChild(img);
+
+  document.body.appendChild(div);
+  setTimeout(() => {
+    div.remove(); 
+  }, animationDuration);
+}
+
+//prompting phase
+const promptingPhase = document.querySelector(".prompting-phase")
+function promptingPhaseRender(playerCount){
+  promptingPhase.classList.remove("display-none")
+  seats.classList.remove("display-none")
+  
+  const questionsCount = document.getElementById("prompting-count")
+  questionsCount.textContent = `0/${playerCount}`
+}
+
+//universal
+const seats = document.getElementById('seats')
+function renderSeats(){
+  seats.classList.remove("display-none")
+}
+function unRenderAll(){
+  joinPhase.classList.add("display-none")
+  joinPhaseHeader.classList.add("display-none")
+  promptingPhase.classList.add("display-none")
+  seats.classList.add("display-none")
+}
+
+//sound functions
+function quietAudience(time) {
+  let quiet = true;
+
+  const intervalId = setInterval(() => {
+    const currentVol = crowdIndoorSound.volume();
+
+    if (quiet) {
+      if (currentVol > 0.03) {
+        const newVol = Math.max(0.03, currentVol - 0.01);
+        crowdIndoorSound.volume(newVol);
+        console.log("quieter", newVol.toFixed(2));
+      }
+    } else {
+      if (currentVol < 0.1) {
+        const newVol = Math.min(0.1, currentVol + 0.01);
+        crowdIndoorSound.volume(newVol);
+        console.log("louder", newVol.toFixed(2));
+      }
+    }
+  }, 100);
+
+  setTimeout(() => {
+    quiet = false;
+    const stopCheck = setInterval(() => {
+      if (crowdIndoorSound.volume() >= 0.1) {
+        clearInterval(intervalId);
+        clearInterval(stopCheck);
+        console.log("volume reset to normal");
+      }
+    }, 100);
+  }, time);
+}
+
+function cheerAndQuiet(time) {
+  // Play the cheer sound
+  crowdCheerSound.play();
+
+  // After 3 seconds, start lowering the volume
+  setTimeout(() => {
+    const intervalId = setInterval(() => {
+      const currentVol = crowdCheerSound.volume();
+
+      if (currentVol > 0.01) { // Stop lowering volume when it's close to 0
+        const newVol = Math.max(0, currentVol - 0.01);
+        crowdCheerSound.volume(newVol);
+        console.log("quieter", newVol.toFixed(2));
+      } else {
+        // Stop the interval when the volume is at 0
+        clearInterval(intervalId);
+        console.log("sound fully quiet");
+      }
+    }, 100); // Decrease volume every 100ms
+  }, time); // Wait for 3 seconds before starting to quiet down
+}

@@ -10,12 +10,13 @@
   <title>Lad Ladder</title>
 </head>
 <body>
-  <h1 id="waiting"> Waiting For Players</h1>
-  <div id="join-code">
-    <a id="join-link">Room Code:</a>
-    <div id="room-code">XDWM</div>
+  <div id="join-phase-header">
+    <h1 id="waiting"> Waiting For Players</h1>
+    <div id="join-code">
+      <a id="join-link">Room Code:</a>
+      <div id="room-code">XDWM</div>
+    </div>
   </div>
-
   <header>
     <img id="curtains" src="./images/curtains.png">
   </header>
@@ -28,9 +29,15 @@
       <img id="join-curtains" src="./images/join-curtains.png">
       <img id="join-stage" src="./images/join-stage.png">
     </div>
+    <div class="prompting-phase display-none">
+      <img id="prompting-stage" src="./images/stage.png">
+      <h1 id="prompting-guide">Write a Question On Your Own Device:</h1>
+      <div id="prompting-count"></div>
+    </div>
   </main>
   <footer>
     <img id="gaem-tiem-logo" src="gaemtiem-logo.png">
+    <img id="seats" class="display-none" src="./images/seats-footer.png">
   </footer>
 </body>
 <script>

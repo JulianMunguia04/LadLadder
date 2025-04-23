@@ -178,4 +178,75 @@ footer {
   background-color: rgb(110, 110, 110);
 }
 
+#prompting-stage{
+  position: absolute;
+  right: -8vw;
+  bottom: 12vh;
+  width: 55vw;
+  height: 40vh;
+}
+
+#prompting-guide{
+  position: absolute;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: white;
+  font-size: 5vw;
+  top: 10vw;
+  text-align: center;
+  z-index: 2000;
+  margin:0px;
+  padding:0px;
+}
+
+#prompting-count{
+  position: absolute;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: white;
+  font-size: 4vw;
+  top: 25vw;
+  text-align: center;
+  z-index: 2000;
+  margin:0px;
+  padding:0px;
+}
+
+#logo-transition{
+  position:absolute;
+  background-color: black;
+  width: 100vw;
+  height: 100vh;
+  z-index: 9999;
+  opacity: 0;
+  animation: fadeinout 6s;
+  animation-fill-mode: forwards;
+}
+
+#logo-transition img{
+  width: 50%;
+  position: absolute;
+  left: 51%;
+  top: 45%;
+  transform: translate(-50%, -50%);
+  opacity: 0;
+  animation: fadeinout 6s;
+  animation-delay: 2s;
+  animation-fill-mode: forwards;
+}
+
+@keyframes fadeinout {
+  0%{ 
+    opacity: 0;  
+  }
+  10%{
+    opacity: 1
+  }
+  95%{
+    opacity:1
+  }
+  100% { 
+    opacity: 0; 
+  }
+}
 
