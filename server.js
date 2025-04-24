@@ -402,17 +402,17 @@ async function createNewRoom() {
 
 async function createNewPlayer(socketid, room, name, playerNumber){
     const newPlayer = new Players({
-      arts: 0,
-      athleticism: 0,
-      attractiveness: 0,
-      charm: 0,
-      creativity: 0,
-      empathy: 0,
-      humor: 0,
       intelligence: 0,
       morality: 0,
+      charisma: 0,
+      luck: 0,
+      humor: 0,
+      creativity: 0,
+      achievement: 0,
+      attraction: 0,
+      strength: 0,
+      effort: 0,
       points: 0,
-      socialSkills: 0,
       socket: socketid,
       room: room,
       answer: [],
@@ -606,9 +606,9 @@ async function bonusPoints(roomCode) {
 
     // 3. Find and award top two attributes
     const attributes = [
-      'arts', 'athleticism', 'attractiveness', 'charm',
-      'creativity', 'empathy', 'humor', 'intelligence',
-      'morality', 'socialSkills'
+      'intelligence', 'morality', 'charisma', 'luck',
+      'humor', 'creativity', 'attraction', 'strength',
+      'morality', 'effort'
     ];
 
     const topAttributes = {};

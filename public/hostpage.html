@@ -10,7 +10,7 @@
   <title>Lad Ladder</title>
 </head>
 <body>
-  <div id="join-phase-header">
+  <div id="join-phase-header" class="display-none">
     <h1 id="waiting"> Waiting For Players</h1>
     <div id="join-code">
       <a id="join-link">Room Code:</a>
@@ -21,7 +21,7 @@
     <img id="curtains" src="./images/curtains.png">
   </header>
   <main>
-    <div class="join-phase">
+    <div class="join-phase display-none">
       <div id="players-join-container">
 
       </div>
@@ -34,10 +34,25 @@
       <h1 id="prompting-guide">Write a Question On Your Own Device:</h1>
       <div id="prompting-count"></div>
     </div>
+    <div class="rank-phase display-none">
+      <img id="rank-stage" src="./images/rank-stage.png">
+      <h1 id ="rank-question">Who's The most likely to have a one night stand?</h1>
+      <div id="answers-count"></div>
+    </div>
+    <div id="results-phase" class="diisplay-none">
+      <img id="most-least" src="./images/rank.png">
+      <h1 id="question-header">
+        <img id="results-stage" src="./images/stage.png">
+      </h1>
+      <div id="players-results-container">
+      </div>
+      <button class="host-controls display-none" id="next-question">Next Question</button>
+    </div>
   </main>
   <footer>
     <img id="gaem-tiem-logo" src="gaemtiem-logo.png">
-    <img id="seats" class="display-none" src="./images/seats-footer.png">
+    <img id="seats" class="diisplay-none" src="./images/seats-footer.png">
+    <img id="rank-seats" class="display-none" src="./images/ranking-seats.png">
   </footer>
 </body>
 <script>

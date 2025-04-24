@@ -110,7 +110,67 @@ function promptingPhaseRender(playerCount){
   questionsCount.textContent = `0/${playerCount}`
 }
 
+//results phase
+const resultsPhase = document.getElementById("result-phase")
+async function resultsPhaseRender(playerDetails, positiveQuestion, question){
+  const questionHeader = document.getElementById("question-header")
+  questionHeader.innerText = question
+  const playerResultsContainer = document.getElementById("players-results-container")
+  playerResultsContainer.innerHTML = ""
+  const nextQuestion = document.getElementById("next-question")
+  nextQuestion.classList.add("display-none")
+
+  if (positiveQuestion){
+    for (let i = 0; i < playerDetails.length; i++){
+      const playerDivFlex = document.createElement("div");
+      playerDivFlex.classList.add(`player-container-flex`);
+
+      const playerDiv = document.createElement("div");
+      playerDiv.classList.add(`player`);
+      playerDiv.classList.add(`player-${playerDetails[i].playerNumber}`);
+      playerDiv.textContent = playerDetails[i].name;
+
+      const playerPoints = document.createElement("h3")
+      playerPoints.classList.add("points")
+      playerPoints.textContent = `+${(1+i)*100}`
+
+      playerDivFlex.appendChild(playerPoints)
+      playerDivFlex.appendChild(playerDiv)
+
+      playerResultsContainer.appendChild(playerDivFlex);
+      await delay(1000);
+    }
+  }
+  else{
+    for (let i = 0; i < playerDetails.length; i++){
+      const playerDivFlex = document.createElement("div");
+      playerDivFlex.classList.add(`player-container-flex`);
+
+      const playerDiv = document.createElement("div");
+      playerDiv.classList.add(`player`);
+      playerDiv.classList.add(`player-${playerDetails[i].playerNumber}`);
+      playerDiv.textContent = playerDetails[i].name;
+
+      const playerPoints = document.createElement("h3")
+      playerPoints.classList.add("points")
+      playerPoints.textContent = `+${(playerDetails.length -i)*100}`
+
+      playerDivFlex.appendChild(playerPoints)
+      playerDivFlex.appendChild(playerDiv)
+
+      playerResultsContainer.appendChild(playerDivFlex);
+      await delay(1000);
+    }
+  }
+  await delay(500);
+  nextQuestion.classList.remove("display-none")
+}
+
 //universal
+function delay(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
 const seats = document.getElementById('seats')
 function renderSeats(){
   seats.classList.remove("display-none")
@@ -177,3 +237,5 @@ function cheerAndQuiet(time) {
     }, 100); // Decrease volume every 100ms
   }, time); // Wait for 3 seconds before starting to quiet down
 }
+
+resultsPhaseRender(players, true, "Who's most likely to have a one night stand")

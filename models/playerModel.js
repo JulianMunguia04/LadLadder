@@ -1,15 +1,15 @@
 const mongoose = require("mongoose")
 
 const playerSchema = new mongoose.Schema({
-  arts: Number,
-  athleticism: Number,
-  attractiveness: Number,
-  charm: Number,
-  creativity: Number,
-  empathy: Number,
-  humor: Number,
   intelligence: Number,
   morality: Number,
+  charisma: Number,
+  luck: Number,
+  humor : Number,
+  achievement: Number,
+  attraction: Number,
+  strength: Number,
+  effort: Number,
   points: Number,
   socialSkills: Number,
   socket: String,

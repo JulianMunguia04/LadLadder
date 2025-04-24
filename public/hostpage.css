@@ -130,6 +130,8 @@ footer {
   border: solid black 0.4vh;
   border-radius: 1vh;
   font-size: 3vh;
+  animation: rank 1s;
+  animation-fill-mode: forwards;
 }
 .player-1{
   background-color: red;
@@ -250,3 +252,153 @@ footer {
   }
 }
 
+#rank-seats{
+  position: absolute;
+  bottom: -40vh;
+  left: -8vw;
+  width: 200vw;
+  z-index: 3000;
+}
+
+#rank-stage{
+  position: absolute;
+  right: 0vw;
+  bottom: 1vh;
+  width: 100vw;
+  height: 80vh;
+  z-index: 1;
+}
+
+#rank-question{
+  position: absolute;
+  left: 51%;
+  top: 20%;
+  transform: translate(-50%, -50%);
+  transform-origin: center center;
+  color: white;
+  font-size: 4vw;
+  z-index: 2000;
+  text-align: center;
+  animation: question 3s;
+  animation-fill-mode: forwards;
+}
+
+#answers-count{
+  position: absolute;
+  left: 51%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  color: white;
+  font-size: 3vw;
+  z-index: 2000;
+  text-align: center;
+}
+
+@keyframes question {
+  0%{
+    opacity: 0;
+    top: 40%;
+    transform: translate(-50%, -50%)scale(0.5);
+  }
+  15%{
+    opacity: 1;
+    top: 40%;
+    transform: translate(-50%, -50%) scale(2);
+  }
+  24%{
+    top: 40%;
+    transform: translate(-50%, -50%) scale(1.5);
+  }
+  85%{
+    top: 40%;
+    transform: translate(-50%, -50%) scale(1.5);
+  }
+  100%{
+    opacity: 1;
+    top: 20%;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+#results-stage{
+  position: absolute;
+  right: -8vw;
+  bottom: 18vh;
+  width: 55vw;
+  height: 40vh;
+}
+
+#question-header{
+  position: absolute;
+  left: 51%;
+  top: 4%;
+  transform: translate(-50%, -50%);
+  transform-origin: center center;
+  color: white;
+  font-size: 3.5vw;
+  z-index: 2000;
+  text-align: center;
+}
+
+#most-least{
+  position: absolute;
+  left: 51%;
+  top: 25vh;
+  transform: translate(-50%, -50%);
+  width: 45vw;
+  z-index: 2000;
+}
+
+#players-results-container{
+  position:absolute;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  top: 50vh;
+  z-index: 1000;
+  padding: 1vh;
+  display:flex;
+  gap: 2.6vh;
+}
+
+.points{
+  transform-origin: center center;
+  color: white;
+  font-size: 1.5vw;
+  z-index: 2000;
+  text-align: center;
+  margin: 0px;
+  padding: 6px;
+  padding-right: 1.3vw;
+  opacity:0;
+  animation: points 1s;
+  animation-fill-mode: forwards;
+  animation-delay: 0.5s;
+}
+
+.host-controls{
+  animation: points 1s;
+}
+
+@keyframes rank{
+  0%{
+    transform: scale(0.7)
+  }
+  25%{
+    transform: scale(1.1)
+  }
+  50%{
+    transform: scale(1)
+  }
+  100%{
+    transform: scale(1)
+  }
+}
+
+@keyframes points{
+  0%{
+    opacity: 0;
+  }
+  100%{
+    opacity:1;
+  }
+}
