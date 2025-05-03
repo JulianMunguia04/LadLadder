@@ -69,7 +69,7 @@ app.get("/host/:roomCode", async (req, res) => {
     if (currentRoom && !currentRoom.admin) {
       currentRoom.admin = roomCode;
       await currentRoom.save();
-      res.render("host", { roomCode: roomCode });
+      res.render("hostpage", { roomCode: roomCode });
     } else {
       console.log("No room or already has admin");
       res.redirect('/');
@@ -291,6 +291,7 @@ io.on("connection", (socket) => {
         const sortedPlayers = await getPlayersSortedByPoints(roomCode);
         socket.to(roomCode).emit("end-results", bonusPointsInfo, sortedPlayers);
         socket.emit("end-results", bonusPointsInfo, sortedPlayers);
+        console.log(bonusPointsInfo, sortedPlayers)
       }  
     }catch(error){
       console.log(error)

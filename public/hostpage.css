@@ -263,7 +263,7 @@ footer {
 #rank-stage{
   position: absolute;
   right: 0vw;
-  bottom: 1vh;
+  bottom: -5vh;
   width: 100vw;
   height: 80vh;
   z-index: 1;
@@ -292,6 +292,10 @@ footer {
   font-size: 3vw;
   z-index: 2000;
   text-align: center;
+  opacity:0;
+  animation:points 1s;
+  animation-fill-mode: forwards;
+  animation-delay: 3.1s;
 }
 
 @keyframes question {
@@ -402,3 +406,134 @@ footer {
     opacity:1;
   }
 }
+
+#results-stage{
+  position: absolute;
+  right: -8vw;
+  bottom: 12vh;
+  width: 55vw;
+  height: 40vh;
+}
+
+#awards-header{
+  position: absolute;
+  left: 50%;
+  top: 3%;
+  transform: translate(-50%, -50%);
+  transform-origin: center center;
+  color: white;
+  font-size: 3.5vw;
+  z-index: 2000;
+  text-align: center;
+  opacity: 0;
+  animation: points 1s;
+  animation-fill-mode: forwards;
+  animation-delay: 0s;
+}
+
+#award-trophy{
+  position:absolute;
+  z-index: 20001;
+  width: 25%;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  transform-origin: center center;
+  opacity: 0;
+  animation:trophy 2s;
+  animation-fill-mode: forwards;
+  animation-delay: 1s;
+}
+
+@keyframes trophy {
+  0%{
+    opacity: 0;
+    transform: translate(-50%, -50%)scale(0.8);
+  }
+  18%{
+    opacity: 1;
+  }
+  25%{
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1.2);
+  }
+  50%{
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+  80%{
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+  100%{
+    transform: translate(-140%, -50%) scale(1);
+    opacity: 1;
+  }
+}
+
+#awards-player{
+  left: 20%
+}
+
+#players-awards-container{
+  position:absolute;
+  right: 15%;
+  transform: translate(0%, -50%);
+  top: 45vh;
+  z-index: 1000;
+  padding: 1vh;
+  display:flex;
+  gap: 2.6vh;
+}
+
+.player-awards{
+  height: 40vh;
+  width: 55vh;
+  text-align: center;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  border: solid black 0.4vh;
+  border-radius: 1vh;
+  opacity: 0;
+  font-size: 3vh;
+  animation: awarded 1s;
+  animation-fill-mode: forwards;
+  animation-delay:3.5s;
+  z-index: 100;
+}
+
+.points-awarded{
+  transform-origin: center center;
+  color: white;
+  font-size: 1.5vw;
+  z-index: 2000;
+  text-align: center;
+  margin: 0px;
+  padding: 6px;
+  padding-right: 1.3vw;
+  opacity:0;
+  animation: points 1s;
+  animation-fill-mode: forwards;
+  animation-delay: 4s;
+}
+
+@keyframes awarded{
+  0%{
+    opacity: 0;
+    transform: scale(0.7)
+  }
+  25%{
+    opacity: 1;
+    transform: scale(1.1)
+  }
+  50%{
+    opacity: 1;
+    transform: scale(1)
+  }
+  100%{
+    opacity: 1;
+    transform: scale(1)
+  }
+}
+

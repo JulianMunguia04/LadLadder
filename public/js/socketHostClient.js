@@ -28,6 +28,7 @@ socket.on("answer-question", (question, allPlayers)=>{
 socket.on("player-question", (questionCount, playerCount)=>{
   const questionsCount = document.getElementById("questions-count")
   questionsCount.textContent = `${questionCount}/${playerCount}`
+  console.log("playeruqestion")
 })
 
 socket.on("player-join-leave", (players) => {
