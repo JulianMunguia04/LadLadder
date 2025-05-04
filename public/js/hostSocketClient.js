@@ -246,7 +246,7 @@ async function endGamePhase(bonusPointsInfo, sortedPlayers) {
       <h1 id="awards-header" style="opacity:0">
         Player With the Most: <span style="text-decoration:underline">${award.attribute}</span>
       </h1>
-      <img id="award-trophy" src="/images/awards/${award.attribute.toLowerCase()}.svg" style="opacity:0">
+      <img id="award-trophy" src="/images/awards/${award.attribute.toLowerCase()}.png" style="opacity:0">
       <div id="players-awards-container">
         <div class="player-awards-flex">
           <h3 class="awards-points" style="opacity:0">+${award.pointsAwarded}</h3>
@@ -293,15 +293,31 @@ async function endGamePhase(bonusPointsInfo, sortedPlayers) {
 
   // Display rankings - using proper playerNumber field
   finalContainer.innerHTML = '';
-  sortedPlayers.forEach((player, index) => {
+  const newGame = document.getElementById("new-game")
+  await delay(2500)
+  for (let i = 0; i < sortedPlayers.length; i++){
+    console.log(i)
+    const playerDivFlex = document.createElement("div");
+    playerDivFlex.classList.add(`player-container-flex`);
+
     const playerDiv = document.createElement("div");
-    playerDiv.className = `final-player player-${player.playerNumber}`;
-    playerDiv.innerHTML = `
-      <h2>${index + 1}. ${player.name}</h2>
-      <h3>${player.points} Points</h3>
-    `;
-    finalContainer.appendChild(playerDiv);
-  });
+    playerDiv.classList.add(`player`);
+    playerDiv.classList.add(`player-${sortedPlayers[i].playerNumber}`);
+    playerDiv.textContent = sortedPlayers[i].name;
+
+    const playerPoints = document.createElement("h3")
+    playerPoints.classList.add("points")
+    playerPoints.textContent = `+${sortedPlayers[i].points}`
+
+    playerDivFlex.appendChild(playerPoints)
+    playerDivFlex.appendChild(playerDiv)
+
+    finalContainer.appendChild(playerDivFlex);
+    await delay(1000);
+  }
+  
+  await delay(500);
+  newGame.classList.remove("display-none")
 }
 
 //universal

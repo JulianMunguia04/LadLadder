@@ -55,10 +55,11 @@
       <h1 id="final-header">
         Final Results
       </h1>
+      <img id="most-least-end" src="./images/rank.png">
       <div id="final-container">
 
       </div>
-      <!--<button onclick="window.location.href='/host';" id="new-game" style="margin-top: 2%">New Game</button>-->
+      <button onclick="window.location.href='/host';" id="new-game" class="display-none" style="margin-top: 2%">New Game</button>
     </div>
   </main>
   <footer>
@@ -96,55 +97,55 @@
   // Show awards phase
   awardsPhase.classList.remove("display-none");
 
-  for (const award of bonusPointsInfo.awards) {
-    // Create fresh award elements
-    awardsPhase.innerHTML = `
-      <h1 id="awards-header">
-        Player With the Most: <span style="text-decoration:underline">${award.attribute}</span>
-      </h1>
-      <img id="award-trophy" src="./images/awards/${award.attribute.toLowerCase()}.svg">
-      <div id="players-awards-container" class="awards-player">
-        <div class="player-awards-flex">
-          <h3 class="awards-points">+${award.pointsAwarded}</h3>
-          <div id="awarded-player" class="player-awards player-${award.player.playerNumber}">
-            ${award.player.name}
-          </div>
-        </div>
-      </div>
-    `;
-
-    // Force browser to recognize new elements before animating
-    void awardsPhase.offsetWidth;
-
-    // Play animations
-    document.getElementById("awards-header").style.animation = "points 1s forwards";
-    document.getElementById("award-trophy").style.animation = "trophy 2s 1s forwards";
-    document.getElementById("awarded-player").style.animation = "awarded 1s 3.5s forwards";
-    document.querySelector(".awards-points").style.animation = "points 1s 4s forwards";
-
-    // Wait for all animations to complete (4s animations + 2s buffer)
-    await new Promise(resolve => setTimeout(resolve, 6000));
-    
-    // Clear the phase briefly before next award
-    awardsPhase.innerHTML = '';
-    await new Promise(resolve => setTimeout(resolve, 1000));
-  }
-
   // Show final results
   awardsPhase.classList.add("display-none");
   finalResults.classList.remove("display-none");
 
   // Display final rankings
+  //finalContainer.innerHTML = '';
+  //ortedPlayers.forEach((player, index) => {
+    //const playerDiv = document.createElement("div");
+    //playerDiv.className = `final-player player-${player.playNumber}`;
+    //playerDiv.innerHTML = `
+      //<h2>${index + 1}. ${player.name}</h2>
+    //  <h3>${player.points} Points</h3>
+    //`;
+   // finalContainer.appendChild(playerDiv);
+ // });
+}
+
+async function resultsPhaseRender(playerDetails){
+  const finalContainer = document.getElementById("final-container")
   finalContainer.innerHTML = '';
-  sortedPlayers.forEach((player, index) => {
+  const newGame = document.getElementById("new-game")
+  await delay(2500)
+  for (let i = 0; i < 3; i++){
+    console.log(i)
+    const playerDivFlex = document.createElement("div");
+    playerDivFlex.classList.add(`player-container-flex`);
+
     const playerDiv = document.createElement("div");
-    playerDiv.className = `final-player player-${player.playNumber}`;
-    playerDiv.innerHTML = `
-      <h2>${index + 1}. ${player.name}</h2>
-      <h3>${player.points} Points</h3>
-    `;
-    finalContainer.appendChild(playerDiv);
-  });
+    playerDiv.classList.add(`player`);
+    playerDiv.classList.add(`player-${playerDetails[i].playerNumber}`);
+    playerDiv.textContent = playerDetails[i].name;
+
+    const playerPoints = document.createElement("h3")
+    playerPoints.classList.add("points")
+    playerPoints.textContent = `+${(1+i)*100}`
+
+    playerDivFlex.appendChild(playerPoints)
+    playerDivFlex.appendChild(playerDiv)
+
+    finalContainer.appendChild(playerDivFlex);
+    await delay(1000);
+  }
+  
+  await delay(500);
+  newGame.classList.remove("display-none")
+}
+
+function delay(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
 }
 
 // Test data
@@ -159,12 +160,13 @@ const bonusPointsInfo = {
 };
 
 const sortedPlayers = [
-  {playNumber: 1, name: "Julian", points: 300},
-  {playNumber: 2, name: "Roman", points: 200},
-  {playNumber: 3, name: "Orest", points: 100}
+  {playerNumber: 1, name: "Julian", points: 100},
+  {playerNumber: 2, name: "Roman", points: 200},
+  {playerNumber: 3, name: "Orest", points: 300}
 ];
 
 // Run the awards sequence
 endGamePhase(bonusPointsInfo, sortedPlayers);
+resultsPhaseRender(sortedPlayers)
 </script>
 </html>

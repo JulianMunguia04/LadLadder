@@ -14,7 +14,7 @@
     <h1 id="waiting"> Waiting For Players</h1>
     <div id="join-code">
       <a id="join-link">Room Code:</a>
-      <div id="room-code">XDWM</div>
+      <div id="room-code"><%= roomCode %></div>
     </div>
   </div>
   <header>
@@ -56,10 +56,11 @@
       <h1 id="final-header">
         Final Results
       </h1>
+      <img id="most-least-end" src="/images/rank.png">
       <div id="final-container">
 
       </div>
-      <!--<button onclick="window.location.href='/host';" id="new-game" style="margin-top: 2%">New Game</button>-->
+      <button onclick="window.location.href='/host';" id="new-game" class="display-none" style="margin-top: 2%">New Game</button>
     </div>
   </main>
   <footer>
