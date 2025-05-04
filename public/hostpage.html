@@ -49,22 +49,16 @@
       </div>
       <button class="host-controls display-none" id="next-question">Next Question</button>
     </div>
-    <div id="awards-phase" class="diisplay-none">
-      <h1 id="awards-header">
-        Player With the Most: <span style="text-decoration:underline">Strength</span>
+    <div id="awards-phase" class="display-none"> 
+    </div>
+    <div id="final-results" class="display-none">
+      <h1 id="final-header">
+        Final Results
       </h1>
-      <img id="award-trophy" src="./images/awards/strength.svg">
-      <div id="awards-points">
+      <div id="final-container">
+
       </div>
-        <div id="players-awards-container" class="awards-player display-none">
-          <div class="player-awards-flex">
-            <h3 class="points-awarded">+100</h3>
-            <div id="awarded-player" class="player-awards player-1">
-              Julian
-            </div>
-          </div>
-        </div>
-      </div> 
+      <!--<button onclick="window.location.href='/host';" id="new-game" style="margin-top: 2%">New Game</button>-->
     </div>
   </main>
   <footer>
@@ -90,5 +84,87 @@
     waitingFrame = (waitingFrame + 1) % 4;
   }
   setInterval(waitingAnimation,400)
+
+  async function endGamePhase(bonusPointsInfo, sortedPlayers) {
+  const awardsPhase = document.getElementById("awards-phase");
+  const finalResults = document.getElementById("final-results");
+  const finalContainer = document.getElementById("final-container");
+
+  // Hide final results initially
+  finalResults.classList.add("display-none");
+  
+  // Show awards phase
+  awardsPhase.classList.remove("display-none");
+
+  for (const award of bonusPointsInfo.awards) {
+    // Create fresh award elements
+    awardsPhase.innerHTML = `
+      <h1 id="awards-header">
+        Player With the Most: <span style="text-decoration:underline">${award.attribute}</span>
+      </h1>
+      <img id="award-trophy" src="./images/awards/${award.attribute.toLowerCase()}.svg">
+      <div id="players-awards-container" class="awards-player">
+        <div class="player-awards-flex">
+          <h3 class="awards-points">+${award.pointsAwarded}</h3>
+          <div id="awarded-player" class="player-awards player-${award.player.playerNumber}">
+            ${award.player.name}
+          </div>
+        </div>
+      </div>
+    `;
+
+    // Force browser to recognize new elements before animating
+    void awardsPhase.offsetWidth;
+
+    // Play animations
+    document.getElementById("awards-header").style.animation = "points 1s forwards";
+    document.getElementById("award-trophy").style.animation = "trophy 2s 1s forwards";
+    document.getElementById("awarded-player").style.animation = "awarded 1s 3.5s forwards";
+    document.querySelector(".awards-points").style.animation = "points 1s 4s forwards";
+
+    // Wait for all animations to complete (4s animations + 2s buffer)
+    await new Promise(resolve => setTimeout(resolve, 6000));
+    
+    // Clear the phase briefly before next award
+    awardsPhase.innerHTML = '';
+    await new Promise(resolve => setTimeout(resolve, 1000));
+  }
+
+  // Show final results
+  awardsPhase.classList.add("display-none");
+  finalResults.classList.remove("display-none");
+
+  // Display final rankings
+  finalContainer.innerHTML = '';
+  sortedPlayers.forEach((player, index) => {
+    const playerDiv = document.createElement("div");
+    playerDiv.className = `final-player player-${player.playNumber}`;
+    playerDiv.innerHTML = `
+      <h2>${index + 1}. ${player.name}</h2>
+      <h3>${player.points} Points</h3>
+    `;
+    finalContainer.appendChild(playerDiv);
+  });
+}
+
+// Test data
+const bonusPointsInfo = {
+  awards: [
+    { attribute: 'morality', player: {playerNumber: 1, name: "Julian"}, pointsAwarded: 100 },
+    { attribute: 'charisma', player: {playerNumber: 2, name: "Roman"}, pointsAwarded: 100 },
+    { attribute: 'modesty', player: {playerNumber: 3, name: "Orest"}, pointsAwarded: 100 }
+  ],
+  totalPointsDistributed: 300,
+  playersCount: 1
+};
+
+const sortedPlayers = [
+  {playNumber: 1, name: "Julian", points: 300},
+  {playNumber: 2, name: "Roman", points: 200},
+  {playNumber: 3, name: "Orest", points: 100}
+];
+
+// Run the awards sequence
+endGamePhase(bonusPointsInfo, sortedPlayers);
 </script>
 </html>

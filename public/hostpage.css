@@ -472,8 +472,10 @@ footer {
 }
 
 #awards-player{
-  left: 20%
+  left: 20%;
 }
+
+.awards-points
 
 #players-awards-container{
   position:absolute;
@@ -503,7 +505,7 @@ footer {
   z-index: 100;
 }
 
-.points-awarded{
+.awards-points{
   transform-origin: center center;
   color: white;
   font-size: 1.5vw;
@@ -537,3 +539,54 @@ footer {
   }
 }
 
+#final-header{
+  position: absolute;
+  left: 51%;
+  top: 20%;
+  transform: translate(-50%, -50%);
+  transform-origin: center center;
+  color: white;
+  font-size: 6vw;
+  z-index: 20000;
+  text-align: center;
+  animation: final 3s;
+  animation-fill-mode: forwards;
+}
+
+@keyframes final {
+  0%{
+    opacity: 0;
+    top: 40%;
+    transform: translate(-50%, -50%)scale(0.5);
+  }
+  15%{
+    opacity: 1;
+    top: 40%;
+    transform: translate(-50%, -50%) scale(2);
+  }
+  24%{
+    top: 40%;
+    transform: translate(-50%, -50%) scale(1.5);
+  }
+  62%{
+    top: 40%;
+    transform: translate(-50%, -50%) scale(1.5);
+  }
+  77%{
+    opacity: 1;
+    top: 6%;
+    transform: translate(-50%, -50%) scale(1);
+  }
+  100%{
+    opacity: 1;
+    top: 6%;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+.player-awards-flex{
+  position: absolute;
+  left: 70%;
+  top: 48%;
+  transform: translate(-50%, -50%);
+}

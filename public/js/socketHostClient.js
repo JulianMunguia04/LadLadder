@@ -162,85 +162,83 @@ function resultsPhase(playerDetails, positiveQuestion, question){
 }
 
 async function endGamePhase(bonusPointsInfo, sortedPlayers) {
-  try {
-    // Get DOM elements
-    const resultsPhase = document.getElementById("results-phase");
-    const awardsPhase = document.getElementById("awards-phase");
-    const finalResults = document.getElementById("final-results");
-    const finalContainer = document.getElementById("final-container");
-    const awardsHeader = document.getElementById("awards-header");
-    const awardsPoints = document.getElementById("awards-points");
-    const awardedPlayer = document.getElementById("awarded-player");
+  unRenderAll()
+  
+  const awardsPhase = document.getElementById("awards-phase");
+  const finalResults = document.getElementById("final-results");
+  const finalContainer = document.getElementById("final-container");
 
-    // Validate elements exist
-    if (!resultsPhase || !awardsPhase || !finalResults || !finalContainer || 
-        !awardsHeader || !awardsPoints || !awardedPlayer) {
-      throw new Error("Required DOM elements not found");
-    }
+  // Reset states
+  awardsPhase.innerHTML = '';
+  awardsPhase.classList.remove("display-none", "displayNone"); // Handle both cases
+  finalResults.classList.add("display-none", "displayNone");
+  
+  // Ensure we have a clean slate
+  await new Promise(resolve => setTimeout(resolve, 50));
 
-    // Clear previous results
-    finalContainer.innerHTML = '';
+  for (const award of bonusPointsInfo.awards) {
+    // Clear previous content
+    awardsPhase.innerHTML = '';
     
-    // Switch to awards phase
-    resultsPhase.classList.add("displayNone");
-    awardsPhase.classList.remove("displayNone");
-    finalResults.classList.add("displayNone");
+    // Create fresh elements with animation-ready structure
+    awardsPhase.innerHTML = `
+      <h1 id="awards-header" style="opacity:0">
+        Player With the Most: <span style="text-decoration:underline">${award.attribute}</span>
+      </h1>
+      <img id="award-trophy" src="./images/awards/${award.attribute.toLowerCase()}.svg" style="opacity:0">
+      <div id="players-awards-container" class="awards-player" style="opacity:0">
+        <div class="player-awards-flex">
+          <h3 class="awards-points" style="opacity:0">+${award.pointsAwarded}</h3>
+          <div id="awarded-player" class="player-awards player-${award.player.playNumber}" style="opacity:0">
+            ${award.player.name}
+          </div>
+        </div>
+      </div>
+    `;
 
-    // Show awards one by one
-    for (const award of bonusPointsInfo.awards) {
-      awardsHeader.innerText = `Most ${award.attribute}:`;
-      awardsPoints.innerText = `+${award.pointsAwarded}`;
-      
-      // Update player display with animation
-      awardedPlayer.className = 'awarded-player';
-      awardedPlayer.classList.add(`player-${award.player.playerNumber}`);
-      awardedPlayer.innerText = award.player.name;
-      awardedPlayer.classList.add('award-animation');
-      
-      await new Promise(resolve => setTimeout(resolve, 3000));
-      awardedPlayer.classList.remove('award-animation');
-    }
+    // Force reflow and start animations
+    void awardsPhase.offsetWidth;
+    
+    // Apply animations with !important
+    const style = document.createElement('style');
+    style.textContent = `
+      #awards-header {
+        animation: points 1s forwards !important;
+      }
+      #award-trophy {
+        animation: trophy 2s 1s forwards !important;
+      }
+      #awarded-player {
+        animation: awarded 1s 3.5s forwards !important;
+      }
+      .awards-points {
+        animation: points 1s 4s forwards !important;
+      }
+    `;
+    document.head.appendChild(style);
 
-    // Switch to final results
-    awardsPhase.classList.add("displayNone");
-    finalResults.classList.remove("displayNone");
-
-    // Show players in order with animation
-    for (let j = 0; j < sortedPlayers.length; j++) {
-      const player = sortedPlayers[j];
-      
-      const playerFinalDiv = document.createElement("div");
-      playerFinalDiv.classList.add("player-final", `player-${player.playerNumber}`);
-      playerFinalDiv.style.opacity = "0";
-      playerFinalDiv.style.transform = "translateY(20px)";
-
-      const playerFinalPointsDiv = document.createElement("div");
-      playerFinalPointsDiv.classList.add("player-final-points");
-      playerFinalPointsDiv.innerText = player.points;
-
-      const playerFinalName = document.createElement("div");
-      playerFinalName.classList.add("player-final-name");
-      playerFinalName.innerText = player.name;
-
-      playerFinalDiv.appendChild(playerFinalPointsDiv);
-      playerFinalDiv.appendChild(playerFinalName);
-      finalContainer.appendChild(playerFinalDiv);
-
-      // Animate entry
-      setTimeout(() => {
-        playerFinalDiv.style.opacity = "1";
-        playerFinalDiv.style.transform = "translateY(0)";
-        playerFinalDiv.style.transition = "all 0.5s ease-out";
-      }, 10);
-
-      await new Promise(resolve => setTimeout(resolve, 1000));
-    }
-
-  } catch (error) {
-    console.error("Error in endGamePhase:", error);
-    // Fallback to immediate results display if something fails
-    document.getElementById("results-phase")?.classList.remove("displayNone");
-    document.getElementById("awards-phase")?.classList.add("displayNone");
-    document.getElementById("final-results")?.classList.add("displayNone");
+    // Wait for animations to complete
+    await new Promise(resolve => setTimeout(resolve, 6000));
+    
+    // Clean up
+    document.head.removeChild(style);
+    awardsPhase.innerHTML = '';
+    await new Promise(resolve => setTimeout(resolve, 1000));
   }
+
+  // Show final results
+  awardsPhase.classList.add("display-none");
+  finalResults.classList.remove("display-none");
+
+  // Display rankings
+  finalContainer.innerHTML = '';
+  sortedPlayers.forEach((player, index) => {
+    const playerDiv = document.createElement("div");
+    playerDiv.className = `final-player player-${player.playNumber}`;
+    playerDiv.innerHTML = `
+      <h2>${index + 1}. ${player.name}</h2>
+      <h3>${player.points} Points</h3>
+    `;
+    finalContainer.appendChild(playerDiv);
+  });
 }

@@ -56,9 +56,19 @@ nextQuestionButton.addEventListener("click", ()=>{
   socket.emit("next-question", roomCode)
 })
 
-socket.on("end-results",(bonusPointsInfo, sortedPlayers)=>{
-  endGamePhase(bonusPointsInfo, sortedPlayers)
-})
+socket.on("end-results", (bonusPointsInfo, sortedPlayers) => {
+  console.log("Received end-results:", { 
+    bonusPointsInfo, 
+    sortedPlayers,
+    awards: bonusPointsInfo?.awards?.map(a => ({
+      attribute: a.attribute,
+      playerNumber: a.player?.playerNumber,
+      name: a.player?.name
+    }))
+  });
+  unRenderAll();
+  endGamePhase(bonusPointsInfo, sortedPlayers);
+});
 
 //sound Effects
 const crowdIndoorSound =new Howl({
@@ -206,99 +216,92 @@ async function resultsPhaseRender(playerDetails, positiveQuestion, question){
 }
 //end-game
 async function endGamePhase(bonusPointsInfo, sortedPlayers) {
-  try {
-    // Get DOM elements
-    const resultsPhase = document.getElementById("results-phase");
-    const awardsPhase = document.getElementById("awards-phase");
-    const finalResults = document.getElementById("final-results");
-    const finalContainer = document.getElementById("final-container");
-    const awardsHeader = document.getElementById("awards-header");
-    const awardedPlayer = document.getElementById("awarded-player");
-    const playersAwardsContainer = document.getElementById("players-awards-container");
-    const awardTrophy = document.getElementById("award-trophy");
-    const pointsElement = document.querySelector(".awards-points");
-
-    // Validate elements exist
-    if (!resultsPhase || !awardsPhase || !finalResults || !finalContainer || 
-        !awardsHeader || !awardedPlayer || !playersAwardsContainer || !awardTrophy || !pointsElement) {
-      throw new Error("Required DOM elements not found");
+  renderSeats()
+    // Add validation
+    if (!bonusPointsInfo?.awards?.length) {
+      console.error("Invalid awards data", bonusPointsInfo);
+      return;
     }
+  
+    // Debug logging
+    console.log("Starting awards phase with:", {
+      awards: bonusPointsInfo,
+      players: sortedPlayers
+    });
+  const awardsPhase = document.getElementById("awards-phase");
+  const finalResults = document.getElementById("final-results");
+  const finalContainer = document.getElementById("final-container");
 
-    // Clear previous results and prepare containers
-    finalContainer.innerHTML = '';
-    playersAwardsContainer.classList.remove("display-none");
+  // Reset states
+  awardsPhase.innerHTML = '';
+  awardsPhase.classList.remove("display-none");
+  finalResults.classList.add("display-none");
+  
+  for (const award of bonusPointsInfo.awards) {
+    // Clear previous content
+    awardsPhase.innerHTML = '';
     
-    // Switch to awards phase
-    resultsPhase.classList.add("display-none");
-    awardsPhase.classList.remove("display-none");
-    finalResults.classList.add("display-none");
+    // Create fresh elements with proper data structure
+    awardsPhase.innerHTML = `
+      <h1 id="awards-header" style="opacity:0">
+        Player With the Most: <span style="text-decoration:underline">${award.attribute}</span>
+      </h1>
+      <img id="award-trophy" src="/images/awards/${award.attribute.toLowerCase()}.svg" style="opacity:0">
+      <div id="players-awards-container">
+        <div class="player-awards-flex">
+          <h3 class="awards-points" style="opacity:0">+${award.pointsAwarded}</h3>
+          <div id="awarded-player" class="player-awards player-${award.player.playerNumber}" style="opacity:0">
+            ${award.player.name}
+          </div>
+        </div>
+      </div>
+    `;
 
-    // Show awards one by one with animations
-    for (const award of bonusPointsInfo.awards) {
-      // Update award information
-      awardsHeader.innerHTML = `Player With the Most: <span style="text-decoration:underline">${award.attribute}</span>`;
-      pointsElement.textContent = `+${award.pointsAwarded}`;
-      
-      // Update player display
-      awardedPlayer.className = 'player-awards';
-      awardedPlayer.classList.add(`player-${award.player.playerNumber}`);
-      awardedPlayer.textContent = award.player.name;
-      
-      // Reset animations
-      awardedPlayer.classList.remove('award-animation');
-      awardTrophy.classList.remove('award-animation');
-      
-      // Trigger reflow to restart animations
-      void awardedPlayer.offsetWidth;
-      void awardTrophy.offsetWidth;
-      
-      // Add animations
-      awardedPlayer.classList.add('award-animation');
-      awardTrophy.classList.add('award-animation');
-      
-      // Wait for animation to complete plus some extra time
-      await new Promise(resolve => setTimeout(resolve, 3000));
-    }
+    // Force reflow and start animations
+    void awardsPhase.offsetWidth;
+    
+    // Apply animations with !important
+    const style = document.createElement('style');
+    style.textContent = `
+      #awards-header {
+        animation: points 1s forwards !important;
+      }
+      #award-trophy {
+        animation: trophy 2s 1s forwards !important;
+      }
+      #awarded-player {
+        animation: awarded 1s 3.5s forwards !important;
+      }
+      .awards-points {
+        animation: points 1s 4s forwards !important;
+      }
+    `;
+    document.head.appendChild(style);
 
-    // Switch to final results phase
-    awardsPhase.classList.add("display-none");
-    finalResults.classList.remove("display-none");
-
-    // Show players in order with staggered animations
-    for (const [index, player] of sortedPlayers.entries()) {
-      const playerFinalDiv = document.createElement("div");
-      playerFinalDiv.className = `player-final player-final-${player.playerNumber}`;
-      playerFinalDiv.style.opacity = "0";
-      playerFinalDiv.style.transform = "translateY(20px)";
-
-      const playerFinalPointsDiv = document.createElement("div");
-      playerFinalPointsDiv.className = "player-final-points";
-      playerFinalPointsDiv.textContent = player.points;
-
-      const playerFinalName = document.createElement("div");
-      playerFinalName.className = "player-final-name";
-      playerFinalName.textContent = player.name;
-
-      playerFinalDiv.appendChild(playerFinalPointsDiv);
-      playerFinalDiv.appendChild(playerFinalName);
-      finalContainer.appendChild(playerFinalDiv);
-
-      // Animate entry with staggered delay
-      setTimeout(() => {
-        playerFinalDiv.style.opacity = "1";
-        playerFinalDiv.style.transform = "translateY(0)";
-      }, index * 200);
-
-      await new Promise(resolve => setTimeout(resolve, 1000));
-    }
-
-  } catch (error) {
-    console.error("Error in endGamePhase:", error);
-    // Fallback to immediate results display if something fails
-    document.getElementById("results-phase")?.classList.remove("display-none");
-    document.getElementById("awards-phase")?.classList.add("display-none");
-    document.getElementById("final-results")?.classList.add("display-none");
+    // Wait for animations to complete
+    await new Promise(resolve => setTimeout(resolve, 6000));
+    
+    // Clean up
+    document.head.removeChild(style);
+    awardsPhase.innerHTML = '';
+    await new Promise(resolve => setTimeout(resolve, 1000));
   }
+
+  // Show final results
+  awardsPhase.classList.add("display-none");
+  finalResults.classList.remove("display-none");
+
+  // Display rankings - using proper playerNumber field
+  finalContainer.innerHTML = '';
+  sortedPlayers.forEach((player, index) => {
+    const playerDiv = document.createElement("div");
+    playerDiv.className = `final-player player-${player.playerNumber}`;
+    playerDiv.innerHTML = `
+      <h2>${index + 1}. ${player.name}</h2>
+      <h3>${player.points} Points</h3>
+    `;
+    finalContainer.appendChild(playerDiv);
+  });
 }
 
 //universal
