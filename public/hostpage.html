@@ -39,14 +39,27 @@
       <h1 id ="rank-question">Who's The most likely to have a one night stand?</h1>
       <div id="answers-count"></div>
     </div>
-    <div id="results-phase" class="diisplay-none">
+    <div id="results-phase" class="display-none">
       <img id="most-least" src="./images/rank.png">
+      <img id="results-stage" src="./images/stage.png">
       <h1 id="question-header">
         <img id="results-stage" src="./images/stage.png">
       </h1>
       <div id="players-results-container">
       </div>
       <button class="host-controls display-none" id="next-question">Next Question</button>
+    </div>
+    <div id="awards-phase" class="display-none"> 
+    </div>
+    <div id="final-results" class="display-none">
+      <h1 id="final-header">
+        Final Results
+      </h1>
+      <img id="most-least-end" src="./images/rank.png">
+      <div id="final-container">
+
+      </div>
+      <button onclick="window.location.href='/host';" id="new-game" class="display-none" style="margin-top: 2%">New Game</button>
     </div>
   </main>
   <footer>
@@ -72,5 +85,88 @@
     waitingFrame = (waitingFrame + 1) % 4;
   }
   setInterval(waitingAnimation,400)
+
+  async function endGamePhase(bonusPointsInfo, sortedPlayers) {
+  const awardsPhase = document.getElementById("awards-phase");
+  const finalResults = document.getElementById("final-results");
+  const finalContainer = document.getElementById("final-container");
+
+  // Hide final results initially
+  finalResults.classList.add("display-none");
+  
+  // Show awards phase
+  awardsPhase.classList.remove("display-none");
+
+  // Show final results
+  awardsPhase.classList.add("display-none");
+  finalResults.classList.remove("display-none");
+
+  // Display final rankings
+  //finalContainer.innerHTML = '';
+  //ortedPlayers.forEach((player, index) => {
+    //const playerDiv = document.createElement("div");
+    //playerDiv.className = `final-player player-${player.playNumber}`;
+    //playerDiv.innerHTML = `
+      //<h2>${index + 1}. ${player.name}</h2>
+    //  <h3>${player.points} Points</h3>
+    //`;
+   // finalContainer.appendChild(playerDiv);
+ // });
+}
+
+async function resultsPhaseRender(playerDetails){
+  const finalContainer = document.getElementById("final-container")
+  finalContainer.innerHTML = '';
+  const newGame = document.getElementById("new-game")
+  await delay(2500)
+  for (let i = 0; i < 3; i++){
+    console.log(i)
+    const playerDivFlex = document.createElement("div");
+    playerDivFlex.classList.add(`player-container-flex`);
+
+    const playerDiv = document.createElement("div");
+    playerDiv.classList.add(`player`);
+    playerDiv.classList.add(`player-${playerDetails[i].playerNumber}`);
+    playerDiv.textContent = playerDetails[i].name;
+
+    const playerPoints = document.createElement("h3")
+    playerPoints.classList.add("points")
+    playerPoints.textContent = `+${(1+i)*100}`
+
+    playerDivFlex.appendChild(playerPoints)
+    playerDivFlex.appendChild(playerDiv)
+
+    finalContainer.appendChild(playerDivFlex);
+    await delay(1000);
+  }
+  
+  await delay(500);
+  newGame.classList.remove("display-none")
+}
+
+function delay(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+// Test data
+const bonusPointsInfo = {
+  awards: [
+    { attribute: 'morality', player: {playerNumber: 1, name: "Julian"}, pointsAwarded: 100 },
+    { attribute: 'charisma', player: {playerNumber: 2, name: "Roman"}, pointsAwarded: 100 },
+    { attribute: 'modesty', player: {playerNumber: 3, name: "Orest"}, pointsAwarded: 100 }
+  ],
+  totalPointsDistributed: 300,
+  playersCount: 1
+};
+
+const sortedPlayers = [
+  {playerNumber: 1, name: "Julian", points: 100},
+  {playerNumber: 2, name: "Roman", points: 200},
+  {playerNumber: 3, name: "Orest", points: 300}
+];
+
+// Run the awards sequence
+endGamePhase(bonusPointsInfo, sortedPlayers);
+resultsPhaseRender(sortedPlayers)
 </script>
 </html>
