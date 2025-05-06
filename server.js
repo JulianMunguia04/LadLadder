@@ -176,15 +176,14 @@ io.on("connection", (socket) => {
   
       // 4. Add a random question and wait for it to finish
       await addRandomGameQuestionToRoom(roomCode);
-      await addRandomGameQuestionToRoom(roomCode);
   
       // 5. REFETCH the room to get the latest state (critical!)
       const updatedRoom = await Room.findOne({ room: roomCode }).populate('questions');
   
       // 6. Check if we need more questions
-      if (updatedRoom.questions.length < updatedRoom.players.length * 3) {
-        socket.to(roomCode).emit("player-question", (updatedRoom.questions.length/3), updatedRoom.players.length);
-        socket.emit("player-question", (updatedRoom.questions.length/3), updatedRoom.players.length);
+      if (updatedRoom.questions.length < updatedRoom.players.length * 2) {
+        socket.to(roomCode).emit("player-question", (updatedRoom.questions.length/2), updatedRoom.players.length);
+        socket.emit("player-question", (updatedRoom.questions.length/2), updatedRoom.players.length);
       } else {
         // 7. Start the game with the first question
         const firstQuestion = await Questions.findOne({_id:updatedRoom.questions[0]});
