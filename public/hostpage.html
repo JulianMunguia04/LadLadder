@@ -125,19 +125,38 @@ async function resultsPhaseRender(playerDetails){
     playerDivFlex.classList.add(`player-container-flex`);
 
     const playerDiv = document.createElement("div");
-    playerDiv.classList.add(`player`);
+    if (i == 3-1){
+      playerDiv.classList.add(`player-last`);
+      cheerAndQuiet(7000)
+    }
+    else{
+      playerDiv.classList.add(`player`);
+    }
     playerDiv.classList.add(`player-${playerDetails[i].playerNumber}`);
     playerDiv.textContent = playerDetails[i].name;
 
     const playerPoints = document.createElement("h3")
-    playerPoints.classList.add("points")
+    if (i== 3-1){
+      playerPoints.classList.add("points-final")
+    }else{
+      playerPoints.classList.add("points")
+    }
     playerPoints.textContent = `+${(1+i)*100}`
 
     playerDivFlex.appendChild(playerPoints)
     playerDivFlex.appendChild(playerDiv)
 
     finalContainer.appendChild(playerDivFlex);
-    await delay(1000);
+    playerRankSound.play()
+    
+    if (i == 3-2){
+      await delay(400)
+      drumRollSound.play()
+      await delay(1000);
+    }else{
+      await delay(500);
+    }
+    
   }
   
   await delay(500);
@@ -168,5 +187,49 @@ const sortedPlayers = [
 // Run the awards sequence
 endGamePhase(bonusPointsInfo, sortedPlayers);
 resultsPhaseRender(sortedPlayers)
+const playerRankSound = new Howl({
+  src: ['./sound-effects/negative-ding.mp4'],
+  volume: 0.15
+})
+const drumRollSound = new Howl({
+  src: ['./sound-effects/drum-roll.mp4'],
+  volume: 0.15
+})
+
+async function testSounds(){
+  for (let i = 0; i < 3; i++){
+    await delay(400)
+    playerRankSound.play()
+    
+  }
+}
+
+function cheerAndQuiet(time) {
+  // Play the cheer sound
+  crowdCheerSound.play();
+
+  // After 3 seconds, start lowering the volume
+  setTimeout(() => {
+    const intervalId = setInterval(() => {
+      const currentVol = crowdCheerSound.volume();
+
+      if (currentVol > 0.01) { // Stop lowering volume when it's close to 0
+        const newVol = Math.max(0, currentVol - 0.01);
+        crowdCheerSound.volume(newVol);
+        console.log("quieter", newVol.toFixed(2));
+      } else {
+        // Stop the interval when the volume is at 0
+        clearInterval(intervalId);
+        console.log("sound fully quiet");
+      }
+    }, 100); // Decrease volume every 100ms
+  }, time); // Wait for 3 seconds before starting to quiet down
+}
+
+const crowdCheerSound = new Howl({
+  src: ['./sound-effects/crowd-cheering.mp3'],
+  volume: 0.15,
+})
+
 </script>
 </html>

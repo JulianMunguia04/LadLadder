@@ -109,6 +109,11 @@ footer {
   text-decoration: underline;
 }
 
+#join-link:active{
+  color: rgb(0, 181, 241);
+  text-decoration: underline;
+}
+
 #players-join-container{
   position:absolute;
   left: 50%;
@@ -133,6 +138,47 @@ footer {
   animation: rank 1s;
   animation-fill-mode: forwards;
 }
+.player-last{
+  height: 20vh;
+  width: 20vh;
+  text-align: center;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  border: solid black 0.4vh;
+  border-radius: 1vh;
+  font-size: 3vh;
+  animation: rank-final 3s;
+  animation-fill-mode: forwards;
+}
+
+@keyframes rank-final{
+  0%{
+    transform: scale(0.2)
+  }
+  12%{
+    transform: scale(1.5)
+  }
+  17%{
+    transform: scale(1.5) rotate(15deg)
+  }
+  27%{
+    transform: scale(1.5) rotate(-15deg)
+  }
+  33%{
+    transform: scale(1.5) rotate(0)
+  }
+  45%{
+    transform: scale(0.8)
+  }
+  50%{
+    transform: scale(1.2)
+  }
+  55%{
+    transform: scale(1)
+  }
+}
+
 .player-1{
   background-color: red;
 }
@@ -376,7 +422,31 @@ footer {
   opacity:0;
   animation: points 1s;
   animation-fill-mode: forwards;
-  animation-delay: 0.5s;
+  animation-delay: 0.2s;
+}
+
+.points-final{
+  transform-origin: center center;
+  color: white;
+  font-size: 1.5vw;
+  z-index: 2000;
+  text-align: center;
+  margin: 0px;
+  padding: 6px;
+  padding-right: 1.3vw;
+  opacity:0;
+  animation: points 1s;
+  animation-fill-mode: forwards;
+  animation-delay: 1.7s;
+}
+
+@keyframes points{
+  0%{
+    opacity: 0;
+  }
+  100%{
+    opacity:1;
+  }
 }
 
 .host-controls{

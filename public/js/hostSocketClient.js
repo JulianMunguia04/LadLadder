@@ -10,6 +10,14 @@ const socket = io(backendUrl, {
 const role = 'host';
 const roomCode = window.location.pathname.split('/')[2];
 
+function copyJoinLink() {
+  const currentUrl = window.location.href;
+
+  const joinUrl = currentUrl.replace('/host/', '/join/');
+
+  navigator.clipboard.writeText(joinUrl)
+}
+
 socket.emit('identify', role, roomCode);
 
 socket.on("player-join-leave", (players) => {
@@ -32,16 +40,24 @@ socket.on("start-game", (playersCount)=>{
 socket.on("player-question", (questionCount, playerCount)=>{
   const questionsCount = document.getElementById("prompting-count")
   questionsCount.textContent = `${questionCount}/${playerCount}`
+  if (questionCount >= 1){
+    beepSound.play()
+  }
 })
 
 socket.on("answer-question", (question, allPlayers)=>{
   rankPhase(question, allPlayers.length)
   console.log(question, allPlayers)
+  wooshInSound.play()
+  setTimeout(() => {
+    wooshOutSound.play()
+  }, 2500);
 })
 
 socket.on("ranked-answer-submitted", (answerCount, playersCount)=>{
   const answersCount = document.getElementById("answers-count")
   answersCount.innerHTML = `${answerCount}/${playersCount}`
+  beepSound.play()
 })
 
 socket.on("ranked-results",(rankedResults, roomCode, positive, question)=>{
@@ -66,14 +82,24 @@ socket.on("end-results", (bonusPointsInfo, sortedPlayers) => {
       name: a.player?.name
     }))
   });
-  unRenderAll();
-  endGamePhase(bonusPointsInfo, sortedPlayers);
+  playIntro()
+  
+  setTimeout(()=>{
+    gameOverSound.play()
+  }, 2000)
+  unRenderAll()
+  renderSeats()
+  rankSeats.classList.add("display-none")
+  setTimeout(() => {
+    unRenderAll();
+    endGamePhase(bonusPointsInfo, sortedPlayers);
+  }, 6000);
 });
 
 //sound Effects
 const crowdIndoorSound =new Howl({
   src: ['/sound-effects/crowd-indoor.mp3'],
-  volume: 0.1,
+  volume: 0.03,
   loop: true
 })
 
@@ -85,6 +111,50 @@ const connectSound = new Howl({
 const crowdCheerSound = new Howl({
   src: ['/sound-effects/crowd-cheering.mp3'],
   volume: 0.15,
+})
+
+const drumRollSound = new Howl({
+  src: ['/sound-effects/drum-roll.mp4'],
+  volume: 0.15
+})
+
+const playerPositiveRankSound = new Howl({
+  src: ['/sound-effects/positive-ding.mp4'],
+  volume: 0.12
+})
+
+const playerNegativeRankSound = new Howl({
+  src: ['/sound-effects/negative-ding.mp4'],
+  volume: 0.15
+})
+
+const crowdOohSound = new Howl({
+  src: ['/sound-effects/crowd-ooh.mp4'],
+  volume: 0.15
+})
+
+const titlesound = new Howl ({
+  src: ['/sound-effects/button-sound-2.mp4'],
+  volume: 0.15
+})
+
+const wooshInSound = new Howl ({
+  src: ['/sound-effects/woosh-in.mp4'],
+  volume: 0.15
+})
+const wooshOutSound = new Howl ({
+  src: ['/sound-effects/woosh-out.mp4'],
+  volume: 0.15
+})
+
+const beepSound = new Howl ({
+  src: ['/sound-effects/beep-sound-1.mp4'],
+  volume: 0.15
+})
+
+const gameOverSound = new Howl ({
+  src: ['/sound-effects/game-over.wav'],
+  volume: 0.15
 })
 
 crowdIndoorSound.play();
@@ -175,19 +245,39 @@ async function resultsPhaseRender(playerDetails, positiveQuestion, question){
       playerDivFlex.classList.add(`player-container-flex`);
 
       const playerDiv = document.createElement("div");
-      playerDiv.classList.add(`player`);
+      if (i === playerDetails.length-1){
+        console.log(i, playerDetails.length)
+        playerDiv.classList.add(`player-last`);
+        cheerAndQuiet(4000)
+        quietAudience(4000) 
+      }
+      else{
+        playerDiv.classList.add(`player`);
+      }
       playerDiv.classList.add(`player-${playerDetails[i].playerNumber}`);
       playerDiv.textContent = playerDetails[i].name;
 
       const playerPoints = document.createElement("h3")
-      playerPoints.classList.add("points")
+      if (i=== playerDetails.length-1){
+        playerPoints.classList.add("points-final")
+      }else{
+        playerPoints.classList.add("points")
+      }
       playerPoints.textContent = `+${(1+i)*100}`
 
       playerDivFlex.appendChild(playerPoints)
       playerDivFlex.appendChild(playerDiv)
 
       playerResultsContainer.appendChild(playerDivFlex);
-      await delay(1000);
+      playerPositiveRankSound.play()
+    
+      if (i == playerDetails.length-2){
+        await delay(400)
+        drumRollSound.play()
+        await delay(1000);
+      }else{
+        await delay(500);
+      }
     }
   }
   else{
@@ -196,19 +286,37 @@ async function resultsPhaseRender(playerDetails, positiveQuestion, question){
       playerDivFlex.classList.add(`player-container-flex`);
 
       const playerDiv = document.createElement("div");
-      playerDiv.classList.add(`player`);
+      if (i === playerDetails.length-1){
+        playerDiv.classList.add(`player-last`);
+        crowdOohSound.play()
+        quietAudience(4000) 
+      }
+      else{
+        playerDiv.classList.add(`player`);
+      }
       playerDiv.classList.add(`player-${playerDetails[i].playerNumber}`);
       playerDiv.textContent = playerDetails[i].name;
 
       const playerPoints = document.createElement("h3")
-      playerPoints.classList.add("points")
+      if (i=== playerDetails.length-1){
+        playerPoints.classList.add("points-final")
+      }else{
+        playerPoints.classList.add("points")
+      }
       playerPoints.textContent = `+${(playerDetails.length -i)*100}`
 
       playerDivFlex.appendChild(playerPoints)
       playerDivFlex.appendChild(playerDiv)
 
       playerResultsContainer.appendChild(playerDivFlex);
-      await delay(1000);
+      playerNegativeRankSound.play()
+      if (i == playerDetails.length-2){
+        await delay(400)
+        drumRollSound.play()
+        await delay(1000);
+      }else{
+        await delay(500);
+      }
     }
   }
   await delay(500);
@@ -261,6 +369,10 @@ async function endGamePhase(bonusPointsInfo, sortedPlayers) {
     void awardsPhase.offsetWidth;
     
     // Apply animations with !important
+    setTimeout(()=>{
+      wooshInSound.play()
+    }, 1200)
+    
     const style = document.createElement('style');
     style.textContent = `
       #awards-header {
@@ -277,19 +389,25 @@ async function endGamePhase(bonusPointsInfo, sortedPlayers) {
       }
     `;
     document.head.appendChild(style);
-
+    setTimeout(()=>{
+      cheerAndQuiet(4000)
+    }, 3200)
     // Wait for animations to complete
-    await new Promise(resolve => setTimeout(resolve, 6000));
+    await new Promise(resolve => setTimeout(resolve, 7000));
     
     // Clean up
     document.head.removeChild(style);
     awardsPhase.innerHTML = '';
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    await new Promise(resolve => setTimeout(resolve, 100));
   }
 
   // Show final results
   awardsPhase.classList.add("display-none");
   finalResults.classList.remove("display-none");
+  wooshInSound.play()
+  setTimeout(() => {
+    wooshOutSound.play()
+  }, 2500);
 
   // Display rankings - using proper playerNumber field
   finalContainer.innerHTML = '';
@@ -301,19 +419,37 @@ async function endGamePhase(bonusPointsInfo, sortedPlayers) {
     playerDivFlex.classList.add(`player-container-flex`);
 
     const playerDiv = document.createElement("div");
-    playerDiv.classList.add(`player`);
+      if (i === sortedPlayers.length-1){
+        console.log(i, sortedPlayers.length)
+        playerDiv.classList.add(`player-last`);
+        cheerAndQuiet(14000)
+        quietAudience(7000) 
+      }
+      else{
+        playerDiv.classList.add(`player`);
+      }
     playerDiv.classList.add(`player-${sortedPlayers[i].playerNumber}`);
     playerDiv.textContent = sortedPlayers[i].name;
 
     const playerPoints = document.createElement("h3")
-    playerPoints.classList.add("points")
+    if (i=== sortedPlayers.length-1){
+      playerPoints.classList.add("points-final")
+    }else{
+      playerPoints.classList.add("points")
+    }
     playerPoints.textContent = `+${sortedPlayers[i].points}`
 
     playerDivFlex.appendChild(playerPoints)
     playerDivFlex.appendChild(playerDiv)
 
     finalContainer.appendChild(playerDivFlex);
-    await delay(1000);
+    if (i == sortedPlayers.length-2){
+      await delay(400)
+      drumRollSound.play()
+      await delay(1000);
+    }else{
+      await delay(500);
+    }
   }
   
   await delay(500);
@@ -347,13 +483,13 @@ function quietAudience(time) {
     const currentVol = crowdIndoorSound.volume();
 
     if (quiet) {
-      if (currentVol > 0.03) {
+      if (currentVol > 0.01) {
         const newVol = Math.max(0.03, currentVol - 0.01);
         crowdIndoorSound.volume(newVol);
         console.log("quieter", newVol.toFixed(2));
       }
     } else {
-      if (currentVol < 0.1) {
+      if (currentVol < 0.03) {
         const newVol = Math.min(0.1, currentVol + 0.01);
         crowdIndoorSound.volume(newVol);
         console.log("louder", newVol.toFixed(2));
@@ -375,7 +511,8 @@ function quietAudience(time) {
 
 function cheerAndQuiet(time) {
   // Play the cheer sound
-  crowdCheerSound.play();
+  crowdCheerSound.volume(0.15)
+  crowdCheerSound.seek(0).play();
 
   // After 3 seconds, start lowering the volume
   setTimeout(() => {
@@ -389,9 +526,9 @@ function cheerAndQuiet(time) {
       } else {
         // Stop the interval when the volume is at 0
         clearInterval(intervalId);
-        console.log("sound fully quiet");
+        crowdCheerSound.stop();
       }
-    }, 100); // Decrease volume every 100ms
+    }, 300); // Decrease volume every 100ms
   }, time); // Wait for 3 seconds before starting to quiet down
 }
 
