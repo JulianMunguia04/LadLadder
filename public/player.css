@@ -219,13 +219,13 @@ main{
   background-color: blue;
 }
 .player-3{
-  background-color: green;
+  background-color: yellow;
 }
 .player-4{
-  background-color: orange;
+  background-color: green;
 }
 .player-5{
-  background-color: yellow;
+  background-color: orange;
 }
 .player-6{
   background-color: violet;
@@ -243,4 +243,19 @@ main{
   display:flex;
   flex-direction: column;
   align-items:center;
+}
+
+.selected-player {
+  outline: 2px solid blue;
+}
+
+.rank-slot {
+  border: 2px dashed #ccc;
+  min-height: 40px;
+  margin: 5px;
+  padding: 5px;
+}
+
+.rank-slot{
+  width: 12%
 }

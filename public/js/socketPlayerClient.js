@@ -1,3 +1,5 @@
+console.log("connected")
+
 const backendUrl = window.location.hostname === 'localhost' 
   ? 'http://localhost:5000' 
   : 'https://ladladder-production.up.railway.app/';
@@ -139,21 +141,124 @@ function populatePlayers(playersEach) {
   playersContainer.innerHTML = "";
   const rankingSection = document.getElementById('ranking-section');
   rankingSection.innerHTML = "";
-  playersEach.forEach(player => {
-    console.log(player)
+
+  playersEach.forEach((player, index) => {
     const playerDiv = document.createElement('div');
     playerDiv.classList.add('player-item');
     playerDiv.classList.add(`player-${player.playerNumber}`);
-    playerDiv.setAttribute('draggable', 'true');
     playerDiv.setAttribute('data-id', player._id);
     playerDiv.textContent = player.name;
 
-    playerDiv.addEventListener('dragstart', handleDragStart);
-    playerDiv.addEventListener('dragend', handleDragEnd);
+    // Add event listener for player selection
+    playerDiv.addEventListener('click', () => handlePlayerSelect(playerDiv));
 
     playersContainer.appendChild(playerDiv);
+
+    // Create placeholder slot for ranking
+    const rankSlot = document.createElement('div');
+    rankSlot.classList.add('rank-slot');
+    rankSlot.setAttribute('data-index', index);
+    
+    // Add event listener for placing selected player into the slot
+    rankSlot.addEventListener('click', () => placeSelectedPlayer(rankSlot));
+
+    rankingSection.appendChild(rankSlot);
   });
 }
+
+let selectedPlayer = null;
+
+// Handle player selection and deselection
+function handlePlayerSelect(playerDiv) {
+  if (selectedPlayer === playerDiv) {
+    // Deselect if tapped again
+    playerDiv.classList.remove('selected-player');
+    selectedPlayer = null;
+  } else {
+    // Deselect previous selection
+    if (selectedPlayer) {
+      selectedPlayer.classList.remove('selected-player');
+    }
+
+    selectedPlayer = playerDiv;
+    selectedPlayer.classList.add('selected-player');
+
+    // Add double-click to unrank and return to unranked section
+    selectedPlayer.ondblclick = () => {
+      document.getElementById('players-container').appendChild(selectedPlayer);
+      selectedPlayer.classList.remove('selected-player');
+      selectedPlayer = null;
+    };
+  }
+}
+
+// Allow players to be moved between ranking slots or back to the player container
+function placeSelectedPlayer(rankSlot) {
+  if (!selectedPlayer) {
+    console.log('No player selected');
+    return;  // Ensure a player is selected before placing them
+  }
+
+  // If slot already has a player, swap them
+  if (rankSlot.firstChild) {
+    const existingPlayer = rankSlot.firstChild;
+
+    // Move the existing player back to the unranked list
+    document.getElementById('players-container').appendChild(existingPlayer);
+  }
+
+  // Remove selected player from their current location (if any)
+  if (selectedPlayer.parentElement.classList.contains('rank-slot')) {
+    selectedPlayer.parentElement.innerHTML = ''; // Clear old slot
+  }
+
+  // Place selected player in new slot
+  rankSlot.innerHTML = ''; // Just to be safe
+  rankSlot.appendChild(selectedPlayer);
+
+  // Remove 'selected-player' class once it's placed
+  selectedPlayer.classList.remove('selected-player');
+  selectedPlayer = null;
+}
+
+// Allow drop in ranking section
+function allowDrop(event) {
+  event.preventDefault();
+}
+
+// Handle drop event
+function drop(event) {
+  event.preventDefault();
+  const playerId = event.dataTransfer.getData("text/plain");
+  const draggedPlayer = document.querySelector(`[data-id="${playerId}"]`);
+  const rankingSection = document.getElementById('ranking-section');
+  rankingSection.appendChild(draggedPlayer);
+}
+
+// Handle click on players inside ranking slots to move them back to player container
+function handleRankSlotClick(event) {
+  const rankSlot = event.target.closest('.rank-slot');
+  if (rankSlot && rankSlot.firstChild) {
+    const playerDiv = rankSlot.firstChild;
+    // Move the player back to the players container
+    document.getElementById('players-container').appendChild(playerDiv);
+    playerDiv.classList.remove('selected-player'); // Optionally remove selected style
+    rankSlot.innerHTML = '';  // Clear the rank slot
+  }
+}
+
+// Dynamically add event listeners to rank slots
+document.addEventListener("DOMContentLoaded", () => {
+  // Add listener for dynamically added rank slots
+  document.querySelectorAll('.rank-slot').forEach(rankSlot => {
+    rankSlot.addEventListener('click', handleRankSlotClick);
+  });
+});
+
+// Adding event listener for rank slots to allow clicking to move players back to container
+document.querySelectorAll('.rank-slot').forEach(rankSlot => {
+  rankSlot.addEventListener('click', handleRankSlotClick);
+});
 
 function handleDragStart(event) {
   event.dataTransfer.setData("text/plain", event.target.dataset.id);
@@ -178,22 +283,33 @@ function drop(event) {
   rankingSection.appendChild(draggedPlayer);
 }
 
-document.getElementById('submit-ranking').addEventListener('click', function() {
-  const rankingSection = document.getElementById('ranking-section');
-  const rankedPlayers = [];
+document.addEventListener("DOMContentLoaded", () => {
+  const submitRankingButton = document.getElementById('submit-ranking');
+if (submitRankingButton) {
+  submitRankingButton.addEventListener('click', function () {
+    const rankingSection = document.getElementById('ranking-section');
+    const rankSlots = rankingSection.querySelectorAll('.rank-slot');
+    const rankedPlayers = [];
 
-  // Get the players in the drop section in their new order
-  const playerElements = rankingSection.querySelectorAll('.player-item');
-  playerElements.forEach(playerElement => {
-    const playerId = playerElement.dataset.id;
-    const playerName = playerElement.textContent;
-    rankedPlayers.push(playerId);
+    rankSlots.forEach(slot => {
+      const playerDiv = slot.querySelector('.player-item');
+      if (playerDiv) {
+        rankedPlayers.push(playerDiv.dataset.id); // Player ID in that rank
+      } else {
+        rankedPlayers.push(null); // Empty slot
+      }
+    });
+
+    // Emit the ranked array to server, preserving order (including blanks)
+    socket.emit("ranked-answer-submit", roomCode, playerId, rankedPlayers);
+
+    const rankPhase = document.getElementById("rank-phase");
+    rankPhase.classList.add("displayNone");
   });
-  // Emit new players to the server
-  socket.emit("ranked-answer-submit", roomCode, playerId,rankedPlayers)
-  const rankPhase = document.getElementById("rank-phase")
-  rankPhase.classList.add("displayNone")
-});
+} else {
+  console.log("Submit ranking button not found");
+}
+})
 
 function endGamePhase(){
   const endGame = document.getElementById("end-game-phase")
