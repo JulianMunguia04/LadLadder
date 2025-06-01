@@ -3,44 +3,43 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="/player.css">
+  <link rel="stylesheet" href="/players.css">
   <title>Lad Ladder</title>
 
   <script src="/socket.io/socket.io.js"></script>
   <script src="/js/socketPlayerClient.js" defer></script>
 </head>
 <body>
-  <nav>
-    Nav
-  </nav>
   <main id="main">
+    <img id="logo" src="/gaemtiem-logo.png">
+    <div id="background"></div>
     <div id="name-phase">
-      <h1>Enter your Name</h1>
-      <div class="container"> 
-        <input class="name-input" id="playerName" type="text" maxlength="12">
+      <img class="name-logo" src="/images/ladladderlogo.png">
+      <div class="name-container">
+        <input class="name-input" id="playerName" type="text" maxlength="12" placeholder="Name">
         <button class="join-button" id="join-button">Join</button>
       </div>
     </div>
     <div id="prompt-phase" class="displayNone">
       <h1>Write your own Question:</h1>
       <div class="input-option-flex">
-        <input id = "question-input" maxlength="65">
+        <input id = "question-input" maxlength="65" autocomplete="off">
         <button id="good-or-bad">Good</button>
       </div>
       <div id="attribute-options">
-        <button class="options intelligence">Intelligence</button>
-        <button class="options morality">Morality</button>
-        <button class="options charisma">Charisma</button>
-        <button class="options luck">Luck</button>
-        <button class="options humor">Humor</button>
-        <button class="options creativity">Creativity</button>
-        <button class="options achievement">Humor</button>
-        <button class="options intelligence">Achievement</button>
-        <button class="options strength">Strength</button>
-        <button class="options effort">Effort</button>
+        <button class="options intelligence">Intelligence &#x1F9E0;</button> <!-- 🧠 -->
+        <button class="options morality">Morality &#x1F47C;</button>      <!-- 👼 -->
+        <button class="options charisma">Charisma &#x1F60E;</button>     <!-- 😎 -->
+        <button class="options luck">Luck &#x1F340;</button>            <!-- 🍀 -->
+        <button class="options humor">Humor &#x1F602;</button>          <!-- 😂 -->
+        <button class="options creativity">Creativity &#x1F3A8;</button> <!-- 🎨 -->
+        <button class="options achievement">Achievement &#x1F3C6;</button><!-- 🏆 -->
+        <button class="options attraction">Attraction &#x2764;</button>  <!-- ❤️ -->
+        <button class="options strength">Strength &#x1F4AA;</button>     <!-- 💪 -->
+        <button class="options effort">Effort &#x1F605;</button>
       </div>
       <button id="send-question">
-        Done
+        Submit
       </button>
     </div>
     <div id="rank-phase" class="displayNone">
@@ -57,8 +56,6 @@
       <h1>See Final Results On Screen</h1>
     </div>
   </main>
-  <footer>
-  </footer>
 </body>
 </html>
 

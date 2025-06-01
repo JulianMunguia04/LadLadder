@@ -147,11 +147,36 @@ io.on("connection", (socket) => {
     }
   });
 
+  socket.on("reconnect-player", async (savedPlayerId, roomCode)=>{
+    const player = await Players.findOne({ _id: savedPlayerId });
+    if(player){
+      socket._id = player._id
+      await player.save();
+      socket.join(roomCode);
+      const currentRoom = await Room.findOne({ room: roomCode });
+      currentGameState = currentRoom.currentGameState
+      //get currentgamestate
+      try{
+        let currentQuestionId = currentRoom.questions[currentRoom.question]._id
+        let currentQuestion = await Questions.findOne({ _id: currentQuestionId });
+        let playerIds = currentRoom.players
+        let allPlayers = await Players.find({ '_id': { $in: playerIds } }).select('_id name playerNumber')
+        if (currentGameState == "ranking"){
+          socket.emit("reconnected", player, roomCode, currentGameState, currentQuestion, allPlayers)
+        }
+      }catch(error){
+        console.log("no questions")
+        socket.emit("reconnected", player, roomCode, currentGameState)
+      }
+    }
+  })
+
   // Handle game join event (simply log for now)
   socket.on("start-game", async (roomCode) => {
     try {
       const currentRoom = await Room.findOne({ room: socket.roomCode });
       currentRoom.gameStarted = true;
+      currentRoom.currentGameState = "prompt"
       currentRoom.save();
       socket.to(socket.roomCode).emit("start-game")   //start-game to players
       socket.emit("start-game", currentRoom.players.length)                //start-game to host
@@ -187,6 +212,8 @@ io.on("connection", (socket) => {
       } else {
         // 7. Start the game with the first question
         const firstQuestion = await Questions.findOne({_id:updatedRoom.questions[0]});
+        updatedRoom.currentGameState = "ranking"
+        updatedRoom.save()
         const players = await Players.find({ _id: { $in: updatedRoom.players } }).select('_id name playerNumber');
         
         socket.to(roomCode).emit("answer-question", firstQuestion.question, players);
@@ -291,6 +318,8 @@ io.on("connection", (socket) => {
         socket.to(roomCode).emit("end-results", bonusPointsInfo, sortedPlayers);
         socket.emit("end-results", bonusPointsInfo, sortedPlayers);
         console.log(bonusPointsInfo, sortedPlayers)
+        currentRoom.currentGameState = "end";
+        currentRoom.save()
       }  
     }catch(error){
       console.log(error)
@@ -300,7 +329,8 @@ io.on("connection", (socket) => {
   // Handle disconnect event (delete game if host disconnects)
   socket.on('disconnect', async () => {
     const { roomCode, role } = socket;
-    
+    const room = await Room.findOne({ room:roomCode });
+    console.log(room)
     if (role === 'host') {
       // Host disconnects, delete the room
       try {
@@ -317,7 +347,7 @@ io.on("connection", (socket) => {
       } catch (error) {
         console.error('Error deleting room:', error);
       }
-    } else if (role === 'player') {
+    } else if (role === 'player' && !room.gameStarted) {
       // Player disconnects, remove them from the room
       try {
         const player = await Players.findOne({ socket: socket.id });
@@ -390,6 +420,7 @@ async function createNewRoom() {
     admin: '',
     gameStarted: false,
     currentAnswers: [],
+    currentGameState: "join"
   });
   try{
     await newRoom.save();
@@ -776,5 +807,14 @@ async function getPlayersByNumber(roomCode){
   } catch (error) {
     console.error('Error finding and sorting documents:', error);
     throw error; // Re-throw the error so calling code can handle it
+  }
+}
+
+async function getPlayerById(id){
+  try{
+    const player = await Players.findById(id)
+    return player;
+  }catch(error){
+    throw error;
   }
 }

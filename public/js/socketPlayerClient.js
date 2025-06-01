@@ -9,12 +9,46 @@ const socket = io(backendUrl, {
   transports: ['websocket', 'polling'] // Important for Railway
 });
 
+let gameStarted = false
+console.log(document.cookie)
+
 const role = 'player';
 const roomCode = window.location.pathname.split('/')[2];
 let playerId;
+let playerName;
 socket.on("get-playerId", (id)=>{
-  playerId = id 
-  console.log(playerId)
+  if(id && typeof id === 'string') {
+    playerId = id;
+    try {
+      localStorage.setItem('userId', id);
+      console.log("Stored playerId: ", id);
+    } catch(e) {
+      console.error("Failed to store playerId:", e);
+    }
+  }
+});
+
+socket.on("reconnected", (savedPlayer, roomCode, currentGameState, currentQuestion, allPlayers) =>{
+  console.log("reconnected", savedPlayer, roomCode, currentGameState, currentQuestion, allPlayers)
+  playerId = savedPlayer._id;
+  playerName = savedPlayer.name;
+  if (currentGameState == "join"){
+    console.log("join-phase")
+  }
+  else if (currentGameState = "ranking"){
+    answeringPhase()
+    renderAnswerQuestion(currentQuestion)
+    populatePlayers(allPlayers)
+  }
+  else if(currentGameState = "prompt"){
+    questionPhase()
+    gameStarted = true
+  }else if (currentGameState = "end"){
+    endGamePhase()
+    localStorage.removeItem('userId');
+  }else{
+    console.log("waiting")
+  }
 })
 
 socket.on("answer-question", (question, allPlayers)=>{
@@ -32,8 +66,17 @@ socket.on("connect", () => {
   console.log("Connected to Socket.io server with ID:", socket.id);
 });
 
+window.onload = function() {
+  userId = localStorage.getItem('userId');
+  console.log("userId: ", userId) 
+  if (userId){
+    socket.emit('reconnect-player', userId, roomCode)
+  }
+}
+
 socket.on("start-game", ()=>{
   questionPhase()
+  gameStarted = true
 })
 
 socket.on("ranked-results",(rankedResults, roomCode, positive)=>{
@@ -42,6 +85,13 @@ socket.on("ranked-results",(rankedResults, roomCode, positive)=>{
 
 socket.on("end-results",(bonusPointsInfo, sortedPlayers)=>{
   endGamePhase()
+  localStorage.removeItem('userId');
+})
+
+socket.on('disconnect', (reason)=>{
+  if (!gameStarted){
+    localStorage.removeItem('userId');
+  }
 })
 
 const joinGameButton = document.getElementById("join-button");
@@ -75,6 +125,7 @@ function questionPhase(){
 //Making Questions
 let selectedAttributes = [];
 const optionButtons = document.querySelectorAll(".options");
+const sendQuestion = document.getElementById("send-question")
 
 optionButtons.forEach(button => {
   button.addEventListener("click", () => {
@@ -100,17 +151,18 @@ goodOrBad.addEventListener("click", ()=>{
     positive = false;
     goodOrBad.textContent="Bad"
     console.log(positive)
+    sendQuestion.classList.add("false")
   }
   else{
     goodOrBad.classList.remove("false")
     positive=true;
     goodOrBad.textContent="Good"
     console.log(positive)
+    sendQuestion.classList.remove("false")
   }
 })
 
 //Send Question
-const sendQuestion = document.getElementById("send-question")
 sendQuestion.addEventListener("click", ()=>{
   const input = document.getElementById("question-input");
   if (input.value && selectedAttributes.length == 2){
@@ -316,3 +368,11 @@ function endGamePhase(){
   endGame.classList.remove("displayNone")
 }
 
+function clearLadderCookies() {
+  // Clear individual cookies by setting them to expire in the past
+  document.cookie = 'ladPlayerId=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+  document.cookie = 'ladRoomCode=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+  document.cookie = 'ladSession=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+  
+  console.log("Ladder game cookies cleared");
+}
