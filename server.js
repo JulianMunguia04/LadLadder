@@ -209,11 +209,11 @@ io.on("connection", (socket) => {
       if (updatedRoom.questions.length < updatedRoom.players.length * 2) {
         socket.to(roomCode).emit("player-question", (updatedRoom.questions.length/2), updatedRoom.players.length);
         socket.emit("player-question", (updatedRoom.questions.length/2), updatedRoom.players.length);
+        updatedRoom.currentGameState = "ranking"
+        updatedRoom.save()
       } else {
         // 7. Start the game with the first question
         const firstQuestion = await Questions.findOne({_id:updatedRoom.questions[0]});
-        updatedRoom.currentGameState = "ranking"
-        updatedRoom.save()
         const players = await Players.find({ _id: { $in: updatedRoom.players } }).select('_id name playerNumber');
         
         socket.to(roomCode).emit("answer-question", firstQuestion.question, players);
@@ -347,7 +347,7 @@ io.on("connection", (socket) => {
       } catch (error) {
         console.error('Error deleting room:', error);
       }
-    } else if (role === 'player' && !room.gameStarted) {
+    } else if (room && role === 'player' && !room.gameStarted) {
       // Player disconnects, remove them from the room
       try {
         const player = await Players.findOne({ socket: socket.id });

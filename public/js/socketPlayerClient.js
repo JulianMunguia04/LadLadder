@@ -35,17 +35,35 @@ socket.on("reconnected", (savedPlayer, roomCode, currentGameState, currentQuesti
   if (currentGameState == "join"){
     console.log("join-phase")
   }
-  else if (currentGameState = "ranking"){
-    answeringPhase()
-    renderAnswerQuestion(currentQuestion)
-    populatePlayers(allPlayers)
+  else if (currentGameState == "ranking"){
+    console.log(localStorage.getItem('phase-answered'))
+    if (localStorage.getItem('phase-answered') == "true"){
+      const namePhase = document.getElementById("name-phase");
+      namePhase.classList.add("displayNone")
+      const waitingDiv = document.querySelector(".waiting")
+      waitingDiv.classList.remove("displayNone")
+    }else if (localStorage.getItem('phase-answered') == "false"){
+      answeringPhase()
+      renderAnswerQuestion(currentQuestion.question)
+      populatePlayers(allPlayers)
+    }
   }
-  else if(currentGameState = "prompt"){
-    questionPhase()
-    gameStarted = true
-  }else if (currentGameState = "end"){
+  else if(currentGameState == "prompt"){
+    console.log(localStorage.getItem('phase-answered'))
+    if (localStorage.getItem('phase-answered') == "true"){
+      const namePhase = document.getElementById("name-phase");
+      namePhase.classList.add("displayNone")
+      const waitingDiv = document.querySelector(".waiting")
+      waitingDiv.classList.remove("displayNone")
+    }else if (localStorage.getItem('phase-answered') == "false"){
+      questionPhase()
+      gameStarted = true
+    }
+    
+  }else if (currentGameState == "end"){
     endGamePhase()
     localStorage.removeItem('userId');
+    localStorage.removeItem("phase-answered")
   }else{
     console.log("waiting")
   }
@@ -103,23 +121,22 @@ joinGameButton.addEventListener("click", () => {
     socket.emit('identify', role, roomCode, name);
     const namePhase = document.getElementById("name-phase");
     namePhase.classList.add(`displayNone`);
-    const playerDiv = document.createElement("div");
-    playerDiv.textContent = "waiting for Others";
-    playerDiv.classList.add("waiting")
-    const main = document.getElementById("main")
-    main.appendChild(playerDiv);
+    const waitingDiv = document.querySelector(".waiting")
+    waitingDiv.classList.remove("displayNone")
   } else {
     alert("Please enter your name before joining the game.");
   }
 });
 
 function questionPhase(){
+  localStorage.removeItem("phase-answered")
+  localStorage.setItem('phase-answered', "false");
   const namePhase = document.getElementById("name-phase");
   namePhase.classList.add("displayNone")
   const promptPhase = document.getElementById("prompt-phase");
   promptPhase.classList.remove("displayNone")
   const waitingDiv = document.querySelector(".waiting")
-  waitingDiv.remove()
+  waitingDiv.classList.add("displayNone")
 }
 
 //Making Questions
@@ -170,6 +187,10 @@ sendQuestion.addEventListener("click", ()=>{
     console.log(selectedAttributes, positive, input.value, roomCode)
     const promptPhase = document.getElementById("prompt-phase");
     promptPhase.classList.add("displayNone")
+    const waitingDiv = document.querySelector(".waiting")
+    waitingDiv.classList.remove("displayNone")
+    localStorage.removeItem("phase-answered")
+    localStorage.setItem('phase-answered', "true");
   }
 })
 
@@ -177,10 +198,16 @@ sendQuestion.addEventListener("click", ()=>{
 //Answering Phase
 
 function answeringPhase(){
+  localStorage.removeItem("phase-answered")
+  localStorage.setItem('phase-answered', "false");
+  const namePhase = document.getElementById("name-phase");
+  namePhase.classList.add(`displayNone`);
   const promptPhase = document.getElementById("prompt-phase");
   promptPhase.classList.add("displayNone")
   const answerPhase = document.getElementById("rank-phase");
   answerPhase.classList.remove("displayNone")
+  const waitingDiv = document.querySelector(".waiting")
+  waitingDiv.classList.add("displayNone")
 }
 
 function renderAnswerQuestion(question){
@@ -351,12 +378,16 @@ if (submitRankingButton) {
         rankedPlayers.push(null); // Empty slot
       }
     });
+    const waitingDiv = document.querySelector(".waiting")
+    waitingDiv.classList.remove("displayNone")
 
     // Emit the ranked array to server, preserving order (including blanks)
     socket.emit("ranked-answer-submit", roomCode, playerId, rankedPlayers);
 
     const rankPhase = document.getElementById("rank-phase");
     rankPhase.classList.add("displayNone");
+    localStorage.removeItem("phase-answered")
+    localStorage.setItem('phase-answered', "true");
   });
 } else {
   console.log("Submit ranking button not found");
@@ -364,15 +395,11 @@ if (submitRankingButton) {
 })
 
 function endGamePhase(){
+  const namePhase = document.getElementById("name-phase");
+  namePhase.classList.add(`displayNone`);
   const endGame = document.getElementById("end-game-phase")
   endGame.classList.remove("displayNone")
-}
-
-function clearLadderCookies() {
-  // Clear individual cookies by setting them to expire in the past
-  document.cookie = 'ladPlayerId=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
-  document.cookie = 'ladRoomCode=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
-  document.cookie = 'ladSession=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
-  
-  console.log("Ladder game cookies cleared");
+  const waitingDiv = document.querySelector(".waiting")
+  waitingDiv.innerText = "Results On Screen"
+  waitingDiv.classList.remove("displayNone")
 }
