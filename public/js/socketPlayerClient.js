@@ -364,35 +364,43 @@ function drop(event) {
 
 document.addEventListener("DOMContentLoaded", () => {
   const submitRankingButton = document.getElementById('submit-ranking');
-if (submitRankingButton) {
-  submitRankingButton.addEventListener('click', function () {
-    const rankingSection = document.getElementById('ranking-section');
-    const rankSlots = rankingSection.querySelectorAll('.rank-slot');
-    const rankedPlayers = [];
+  if (submitRankingButton) {
+    submitRankingButton.addEventListener('click', function () {
+      const rankingSection = document.getElementById('ranking-section');
+      const rankSlots = rankingSection.querySelectorAll('.rank-slot');
+      const rankedPlayers = [];
+      let allRanked = true;
 
-    rankSlots.forEach(slot => {
-      const playerDiv = slot.querySelector('.player-item');
-      if (playerDiv) {
-        rankedPlayers.push(playerDiv.dataset.id); // Player ID in that rank
-      } else {
-        rankedPlayers.push(null); // Empty slot
+      rankSlots.forEach(slot => {
+        const playerDiv = slot.querySelector('.player-item');
+        if (playerDiv) {
+          rankedPlayers.push(playerDiv.dataset.id);
+        } else {
+          allRanked = false;
+          rankedPlayers.push(null);
+        }
+      });
+
+      if (!allRanked) {
+        alert("Please rank all players before submitting!");
+        return;
       }
+
+      const waitingDiv = document.querySelector(".waiting");
+      waitingDiv.classList.remove("displayNone");
+
+      // Emit the ranked array to server
+      socket.emit("ranked-answer-submit", roomCode, playerId, rankedPlayers);
+
+      const rankPhase = document.getElementById("rank-phase");
+      rankPhase.classList.add("displayNone");
+      localStorage.removeItem("phase-answered");
+      localStorage.setItem('phase-answered', "true");
     });
-    const waitingDiv = document.querySelector(".waiting")
-    waitingDiv.classList.remove("displayNone")
-
-    // Emit the ranked array to server, preserving order (including blanks)
-    socket.emit("ranked-answer-submit", roomCode, playerId, rankedPlayers);
-
-    const rankPhase = document.getElementById("rank-phase");
-    rankPhase.classList.add("displayNone");
-    localStorage.removeItem("phase-answered")
-    localStorage.setItem('phase-answered', "true");
-  });
-} else {
-  console.log("Submit ranking button not found");
-}
-})
+  } else {
+    console.log("Submit ranking button not found");
+  }
+});
 
 function endGamePhase(){
   const namePhase = document.getElementById("name-phase");
