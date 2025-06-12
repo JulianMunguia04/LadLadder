@@ -215,42 +215,12 @@ function renderAnswerQuestion(question){
   rankQuestion.innerText = question
 }
 
-function populatePlayers(playersEach) {
-  const playersContainer = document.getElementById('players-container');
-  playersContainer.innerHTML = "";
-  const rankingSection = document.getElementById('ranking-section');
-  rankingSection.innerHTML = "";
-
-  playersEach.forEach((player, index) => {
-    const playerDiv = document.createElement('div');
-    playerDiv.classList.add('player-item');
-    playerDiv.classList.add(`player-${player.playerNumber}`);
-    playerDiv.setAttribute('data-id', player._id);
-    playerDiv.textContent = player.name;
-
-    // Add event listener for player selection
-    playerDiv.addEventListener('click', () => handlePlayerSelect(playerDiv));
-
-    playersContainer.appendChild(playerDiv);
-
-    // Create placeholder slot for ranking
-    const rankSlot = document.createElement('div');
-    rankSlot.classList.add('rank-slot');
-    rankSlot.setAttribute('data-index', index);
-    
-    // Add event listener for placing selected player into the slot
-    rankSlot.addEventListener('click', () => placeSelectedPlayer(rankSlot));
-
-    rankingSection.appendChild(rankSlot);
-  });
-}
-
 let selectedPlayer = null;
 
 // Handle player selection and deselection
 function handlePlayerSelect(playerDiv) {
   if (selectedPlayer === playerDiv) {
-    // Deselect if tapped again
+    // Deselect if clicked again
     playerDiv.classList.remove('selected-player');
     selectedPlayer = null;
   } else {
@@ -258,72 +228,87 @@ function handlePlayerSelect(playerDiv) {
     if (selectedPlayer) {
       selectedPlayer.classList.remove('selected-player');
     }
-
+    
+    // Select new player
     selectedPlayer = playerDiv;
-    selectedPlayer.classList.add('selected-player');
-
-    // Add double-click to unrank and return to unranked section
-    selectedPlayer.ondblclick = () => {
-      document.getElementById('players-container').appendChild(selectedPlayer);
-      selectedPlayer.classList.remove('selected-player');
-      selectedPlayer = null;
-    };
+    playerDiv.classList.add('selected-player');
   }
 }
 
-// Allow players to be moved between ranking slots or back to the player container
+// Handle placing a selected player in a ranking slot
 function placeSelectedPlayer(rankSlot) {
-  if (!selectedPlayer) {
-    console.log('No player selected');
-    return;  // Ensure a player is selected before placing them
-  }
+  if (!selectedPlayer) return;
 
-  // If slot already has a player, swap them
+  // If slot already has a player, return it to players container
   if (rankSlot.firstChild) {
-    const existingPlayer = rankSlot.firstChild;
-
-    // Move the existing player back to the unranked list
-    document.getElementById('players-container').appendChild(existingPlayer);
+    document.getElementById('players-container').appendChild(rankSlot.firstChild);
   }
 
-  // Remove selected player from their current location (if any)
-  if (selectedPlayer.parentElement.classList.contains('rank-slot')) {
-    selectedPlayer.parentElement.innerHTML = ''; // Clear old slot
-  }
-
-  // Place selected player in new slot
-  rankSlot.innerHTML = ''; // Just to be safe
+  // Place selected player in slot
   rankSlot.appendChild(selectedPlayer);
-
-  // Remove 'selected-player' class once it's placed
   selectedPlayer.classList.remove('selected-player');
   selectedPlayer = null;
 }
 
-// Allow drop in ranking section
-function allowDrop(event) {
-  event.preventDefault();
-}
-
-// Handle drop event
-function drop(event) {
-  event.preventDefault();
-  const playerId = event.dataTransfer.getData("text/plain");
-  const draggedPlayer = document.querySelector(`[data-id="${playerId}"]`);
-  const rankingSection = document.getElementById('ranking-section');
-  rankingSection.appendChild(draggedPlayer);
-}
-
-// Handle click on players inside ranking slots to move them back to player container
-function handleRankSlotClick(event) {
-  const rankSlot = event.target.closest('.rank-slot');
-  if (rankSlot && rankSlot.firstChild) {
-    const playerDiv = rankSlot.firstChild;
-    // Move the player back to the players container
-    document.getElementById('players-container').appendChild(playerDiv);
-    playerDiv.classList.remove('selected-player'); // Optionally remove selected style
-    rankSlot.innerHTML = '';  // Clear the rank slot
+// Handle clicking a ranked player to return it to players container
+function handleRankedPlayerClick(event) {
+  const playerDiv = event.target.closest('.player-item');
+  if (!playerDiv) return;
+  
+  // Return player to container
+  document.getElementById('players-container').appendChild(playerDiv);
+  
+  // If this was the selected player, deselect it
+  if (selectedPlayer === playerDiv) {
+    selectedPlayer.classList.remove('selected-player');
+    selectedPlayer = null;
   }
+  
+  // Stop event propagation to prevent the slot click handler from firing
+  event.stopPropagation();
+}
+
+function populatePlayers(playersEach) {
+  const playersContainer = document.getElementById('players-container');
+  playersContainer.innerHTML = "";
+  const rankingSection = document.getElementById('ranking-section');
+  rankingSection.innerHTML = "";
+
+  playersEach.forEach((player, index) => {
+    // Create player div
+    const playerDiv = document.createElement('div');
+    playerDiv.classList.add('player-item');
+    playerDiv.classList.add(`player-${player.playerNumber}`);
+    playerDiv.setAttribute('data-id', player._id);
+    playerDiv.textContent = player.name;
+    
+    // Add click handler for selection
+    playerDiv.addEventListener('click', handlePlayerSelect.bind(null, playerDiv));
+    playersContainer.appendChild(playerDiv);
+
+    // Create rank slot
+    const rankSlot = document.createElement('div');
+    rankSlot.classList.add('rank-slot');
+    rankSlot.setAttribute('data-index', index);
+    
+    // Add click handler for placing selected player or returning ranked player
+    rankSlot.addEventListener('click', (event) => {
+      // If clicking directly on a player in the slot, let that handler deal with it
+      if (event.target.classList.contains('player-item')) return;
+      
+      if (selectedPlayer) {
+        placeSelectedPlayer(rankSlot);
+      } else if (rankSlot.firstChild) {
+        // If no player is selected but slot has a player, return it
+        handleRankedPlayerClick({target: rankSlot.firstChild});
+      }
+    });
+    
+    // Add click handler to players in slots
+    rankSlot.addEventListener('click', handleRankedPlayerClick, true);
+    
+    rankingSection.appendChild(rankSlot);
+  });
 }
 
 // Dynamically add event listeners to rank slots
