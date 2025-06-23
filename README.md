@@ -16,6 +16,7 @@
 ![CSS](https://img.shields.io/badge/CSS3-1572B6?logo=css3&logoColor=white&style=for-the-badge)
 ![AWS EC2](https://img.shields.io/badge/AWS_EC2-FF9900?logo=amazon-aws&logoColor=white&style=for-the-badge)
 ![PM2](https://img.shields.io/badge/PM2-2B037A?logo=pm2&logoColor=white&style=for-the-badge)
+![EJS](https://img.shields.io/badge/EJS-CF4647?logo=ejs&logoColor=white&style=for-the-badge)
 
 ---
 
