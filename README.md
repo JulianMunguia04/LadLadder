@@ -29,7 +29,7 @@
    Other players join using the game code. All connections are handled in real-time using WebSockets.
 
 3. **Question Phase**  
-   Each player submits creative or funny questions about the group. Every question is assigned a character attribute (e.g., loyalty, ambition).
+   Each player submits creative or funny questions about the group. Every question is assigned a character attribute (e.g., strength, charisma, intelligence).
 
 4. **Ranking Phase**  
    Players rank themselves and each other in response to the questions — for example, “Who’s most likely to get married?”
