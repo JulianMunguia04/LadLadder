@@ -32,7 +32,7 @@
    Each player submits creative or funny questions about the group. Every question is assigned a character attribute (e.g., strength, charisma, intelligence).
 
 4. **Ranking Phase**  
-   Players rank themselves and each other in response to the questions — for example, “Who’s most likely to get married?”
+   Players rank themselves and each other in response to the questions — for example, “Who’s most likely to win a Nobel Prize?”
 
 5. **Scoring**  
    - Points are distributed based on how well a player’s rankings align with the group’s.
