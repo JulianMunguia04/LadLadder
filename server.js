@@ -763,7 +763,7 @@ async function deleteRoomQuestions(roomCode) {
     // Delete all questions with matching room code
     const result = await Questions.deleteMany({ room: roomCode });
     
-    console.log(`Deleted ${result.deletedCount} questions for room ${roomCode}`);
+    //console.log(`Deleted ${result.deletedCount} questions for room ${roomCode}`);
     return {
       success: true,
       deletedCount: result.deletedCount
