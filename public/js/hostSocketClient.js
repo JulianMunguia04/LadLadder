@@ -22,7 +22,7 @@ socket.emit('identify', role, roomCode);
 
 socket.on("player-join-leave", (players) => {
   renderStartingPlayers(players); // Add the player to the UI
-  console.log("socket-connected")
+  //console.log("socket-connected")
 });
 
 socket.on("start-game", (playersCount)=>{
@@ -47,7 +47,7 @@ socket.on("player-question", (questionCount, playerCount)=>{
 
 socket.on("answer-question", (question, allPlayers)=>{
   rankPhase(question, allPlayers.length)
-  console.log(question, allPlayers)
+  //console.log(question, allPlayers)
   wooshInSound.play()
   setTimeout(() => {
     wooshOutSound.play()
@@ -61,7 +61,7 @@ socket.on("ranked-answer-submitted", (answerCount, playersCount)=>{
 })
 
 socket.on("ranked-results",(rankedResults, roomCode, positive, question)=>{
-  console.log(rankedResults, roomCode, positive)
+  //console.log(rankedResults, roomCode, positive)
   unRenderAll()
   renderSeats()
   resultsPhaseRender(rankedResults, positive, question)
@@ -73,7 +73,7 @@ nextQuestionButton.addEventListener("click", ()=>{
 })
 
 socket.on("end-results", (bonusPointsInfo, sortedPlayers) => {
-  console.log("Received end-results:", { 
+  /*console.log("Received end-results:", { 
     bonusPointsInfo, 
     sortedPlayers,
     awards: bonusPointsInfo?.awards?.map(a => ({
@@ -81,7 +81,7 @@ socket.on("end-results", (bonusPointsInfo, sortedPlayers) => {
       playerNumber: a.player?.playerNumber,
       name: a.player?.name
     }))
-  });
+  });*/
   playIntro()
   
   setTimeout(()=>{
@@ -246,7 +246,7 @@ async function resultsPhaseRender(playerDetails, positiveQuestion, question){
 
       const playerDiv = document.createElement("div");
       if (i === playerDetails.length-1){
-        console.log(i, playerDetails.length)
+        //console.log(i, playerDetails.length)
         playerDiv.classList.add(`player-last`);
         cheerAndQuiet(4000)
         quietAudience(4000) 
@@ -321,6 +321,9 @@ async function resultsPhaseRender(playerDetails, positiveQuestion, question){
   }
   await delay(500);
   nextQuestion.classList.remove("display-none")
+
+  await delay(6500); // wait 6.5 seconds
+  nextQuestion.click();
 }
 //end-game
 async function endGamePhase(bonusPointsInfo, sortedPlayers) {
@@ -332,10 +335,10 @@ async function endGamePhase(bonusPointsInfo, sortedPlayers) {
     }
   
     // Debug logging
-    console.log("Starting awards phase with:", {
+    /*console.log("Starting awards phase with:", {
       awards: bonusPointsInfo,
       players: sortedPlayers
-    });
+    });*/
   const awardsPhase = document.getElementById("awards-phase");
   const finalResults = document.getElementById("final-results");
   const finalContainer = document.getElementById("final-container");
@@ -414,13 +417,13 @@ async function endGamePhase(bonusPointsInfo, sortedPlayers) {
   const newGame = document.getElementById("new-game")
   await delay(2500)
   for (let i = 0; i < sortedPlayers.length; i++){
-    console.log(i)
+    //console.log(i)
     const playerDivFlex = document.createElement("div");
     playerDivFlex.classList.add(`player-container-flex`);
 
     const playerDiv = document.createElement("div");
       if (i === sortedPlayers.length-1){
-        console.log(i, sortedPlayers.length)
+        //console.log(i, sortedPlayers.length)
         playerDiv.classList.add(`player-last`);
         cheerAndQuiet(14000)
         quietAudience(7000) 
@@ -486,13 +489,13 @@ function quietAudience(time) {
       if (currentVol > 0.01) {
         const newVol = Math.max(0.03, currentVol - 0.01);
         crowdIndoorSound.volume(newVol);
-        console.log("quieter", newVol.toFixed(2));
+        //console.log("quieter", newVol.toFixed(2));
       }
     } else {
       if (currentVol < 0.03) {
         const newVol = Math.min(0.1, currentVol + 0.01);
         crowdIndoorSound.volume(newVol);
-        console.log("louder", newVol.toFixed(2));
+        //console.log("louder", newVol.toFixed(2));
       }
     }
   }, 100);
@@ -503,7 +506,7 @@ function quietAudience(time) {
       if (crowdIndoorSound.volume() >= 0.1) {
         clearInterval(intervalId);
         clearInterval(stopCheck);
-        console.log("volume reset to normal");
+        //console.log("volume reset to normal");
       }
     }, 100);
   }, time);
@@ -522,7 +525,7 @@ function cheerAndQuiet(time) {
       if (currentVol > 0.01) { // Stop lowering volume when it's close to 0
         const newVol = Math.max(0, currentVol - 0.01);
         crowdCheerSound.volume(newVol);
-        console.log("quieter", newVol.toFixed(2));
+        //console.log("quieter", newVol.toFixed(2));
       } else {
         // Stop the interval when the volume is at 0
         clearInterval(intervalId);

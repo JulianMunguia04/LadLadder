@@ -5,7 +5,7 @@ const path = require("path");
 const mongoose = require('mongoose')
 require('dotenv').config();
 
-console.log('MONGODB_URI:', process.env.MONGODB_URI);
+//console.log('MONGODB_URI:', process.env.MONGODB_URI);
 
 const Room = require('./models/roomModel');
 const Players = require('./models/playerModel');
@@ -17,7 +17,7 @@ async function connectDB() {
       useNewUrlParser: true,
       useUnifiedTopology: true
     });
-    console.log('MongoDB Connected');
+    //console.log('MongoDB Connected');
   } catch (err) {
     console.error('Connection error:', err);
     process.exit(1);
@@ -45,7 +45,7 @@ app.get("/", async (req, res) => {
 app.use(express.static(path.join(__dirname, "public")));
 
 app.get("/test", (req, res) => {
-  console.log("Route / accessed");  // Debugging log
+  //console.log("Route / accessed");  // Debugging log
   res.render("index", { title: "Test Page" });
 });
 
@@ -71,7 +71,7 @@ app.get("/host/:roomCode", async (req, res) => {
       await currentRoom.save();
       res.render("hostpage", { roomCode: roomCode });
     } else {
-      console.log("No room or already has admin");
+      //console.log("No room or already has admin");
       res.redirect('/');
     }
   } catch (err) {
@@ -90,7 +90,7 @@ app.get("/join/:roomCode", async (req,res) =>{
       await currentRoom.save();
       res.render("player", { roomCode: roomCode });
     } else {
-      console.log("No room");
+      //console.log("No room");
       res.redirect('/');
     }
   } catch (err) {
@@ -104,7 +104,7 @@ app.get("/join", (req,res)=>{
 })
 
 io.on("connection", (socket) => {
-  console.log(`User connected: ${socket.id}`);
+  //console.log(`User connected: ${socket.id}`);
 
   // Handle identify event (for both host and player)
   socket.on('identify', async (role, roomCode, name) => {
@@ -115,7 +115,7 @@ io.on("connection", (socket) => {
     if (role === 'host') {
       // Host joining the room
       socket.join(roomCode);
-      console.log(`${roomCode} ${role} connected`);
+      //console.log(`${roomCode} ${role} connected`);
     } else if (role === 'player') {
       // Player joining the room
       socket.join(roomCode);
@@ -134,11 +134,11 @@ io.on("connection", (socket) => {
           socket.to(roomCode).emit("player-join-leave", players);
 
           if (currentRoom.players.length >= 3) {
-            console.log("Enough players");
+            //console.log("Enough players");
             socket.to(roomCode).emit("min-players");
           }
         } else {
-          console.log(`Room ${roomCode} is full or doesn't exist`);
+          //console.log(`Room ${roomCode} is full or doesn't exist`);
           socket.emit("room-access-failed")
         }
       } catch (error) {
@@ -165,7 +165,7 @@ io.on("connection", (socket) => {
           socket.emit("reconnected", player, roomCode, currentGameState, currentQuestion, allPlayers)
         }
       }catch(error){
-        console.log("no questions")
+        //console.log("no questions")
         socket.emit("reconnected", player, roomCode, currentGameState)
       }
     }
@@ -250,7 +250,7 @@ io.on("connection", (socket) => {
   
       // Check if all players have submitted their answers
       if (currentRoom.currentAnswers.length === currentRoom.players.length) {
-        console.log("show Results");
+        //console.log("show Results");
   
         // Process the answers to calculate average rankings
         const playerAvgRanking = await processAnswers(roomCode);
@@ -308,7 +308,7 @@ io.on("connection", (socket) => {
         let currentQuestion = await Questions.findOne({ _id: currentQuestionId });
         let playerIds = currentRoom.players
         let allPlayers = await Players.find({ '_id': { $in: playerIds } }).select('_id name playerNumber')
-        console.log(allPlayers) 
+        //console.log(allPlayers) 
         socket.to(socket.roomCode).emit("answer-question", currentQuestion.question, allPlayers)//start-game players
         socket.emit("answer-question", currentQuestion.question, allPlayers)
       }
@@ -317,7 +317,7 @@ io.on("connection", (socket) => {
         const sortedPlayers = await getPlayersSortedByPoints(roomCode);
         socket.to(roomCode).emit("end-results", bonusPointsInfo, sortedPlayers);
         socket.emit("end-results", bonusPointsInfo, sortedPlayers);
-        console.log(bonusPointsInfo, sortedPlayers)
+        //console.log(bonusPointsInfo, sortedPlayers)
         currentRoom.currentGameState = "end";
         currentRoom.save()
       }  
@@ -330,22 +330,22 @@ io.on("connection", (socket) => {
   socket.on('disconnect', async () => {
     const { roomCode, role } = socket;
     const room = await Room.findOne({ room:roomCode });
-    console.log(room)
+    //console.log(room)
     if (role === 'host') {
       // Host disconnects, delete the room
       try {
         const result = await Room.deleteOne({ room: roomCode });
 
         if (result.deletedCount === 0) {
-          console.log('Room not found or already deleted');
+          //console.log('Room not found or already deleted');
         } else {
-          console.log(`Room with code ${roomCode} deleted.`);
+          //console.log(`Room with code ${roomCode} deleted.`);
           io.emit('user-disconnected', roomCode, role);
         }
         deleteRoomQuestions(roomCode)
         deleteRoomPlayers(roomCode)
       } catch (error) {
-        console.error('Error deleting room:', error);
+        //console.error('Error deleting room:', error);
       }
     } else if (room && role === 'player' && !room.gameStarted) {
       // Player disconnects, remove them from the room
@@ -361,21 +361,21 @@ io.on("connection", (socket) => {
               (playerId) => playerId.toString() !== player._id.toString()
             );
             await currentRoom.save();
-            console.log(`Player ${player._id} removed from room ${roomCode}`);
+            //console.log(`Player ${player._id} removed from room ${roomCode}`);
 
             // Optionally, delete the player document from the Players collection
             await Players.deleteOne({ _id: player._id });
-            console.log(`Player ${player._id} deleted from database`);
+            //console.log(`Player ${player._id} deleted from database`);
 
             // Notify other clients that a player has disconnected
             io.to(roomCode).emit('player-disconnected', { playerId: player._id, roomCode });
             const players = await getPlayersByNumber(roomCode)
             socket.to(roomCode).emit("player-join-leave", players);
           } else {
-            console.log(`Room ${roomCode} not found`);
+            //console.log(`Room ${roomCode} not found`);
           }
         } else {
-          console.log(`Player with socket ID ${socket.id} not found`);
+          //console.log(`Player with socket ID ${socket.id} not found`);
         }
       } catch (error) {
         console.error('Error handling player disconnection:', error);
@@ -424,7 +424,7 @@ async function createNewRoom() {
   });
   try{
     await newRoom.save();
-    console.log("New room created ", newRoom);
+    //console.log("New room created ", newRoom);
   }catch(error){
     console.error('Error Creating room', error)
   }
@@ -453,7 +453,7 @@ async function createNewPlayer(socketid, room, name, playerNumber){
   });
   try{
     await newPlayer.save();
-    console.log("Player joined ", room);
+    //console.log("Player joined ", room);
   }catch(error){
     console.error('Error adding Player', error)
   }
@@ -470,7 +470,7 @@ async function createNewQuestion(attributes, positive, question, roomCode){
   })
   try{
     await newQuestion.save();
-    console.log("Question added");
+    // console.log("Question added");
     return newQuestion;
   }catch(error){
     console.error('Error Question not added', error)
@@ -487,16 +487,16 @@ async function processAnswers(roomCode) {
     const players = currentRoom.players;
     const currentAnswers = currentRoom.currentAnswers;
 
-    console.log("Players:", players);
-    console.log("Current Answers:", currentAnswers);
+    //console.log("Players:", players);
+    //console.log("Current Answers:", currentAnswers);
 
     const playersAsStrings = players.map((player) => player.toString());
     const currentAnswersAsStrings = currentAnswers.map((answer) =>
       answer.map((id) => id.toString())
     );
 
-    console.log("Players as Strings:", playersAsStrings);
-    console.log("Current Answers as Strings:", currentAnswersAsStrings);
+    //console.log("Players as Strings:", playersAsStrings);
+    //console.log("Current Answers as Strings:", currentAnswersAsStrings);
 
     const transposedRankings = playersAsStrings.map((player, playerIndex) => {
       return currentAnswersAsStrings.map((answer) => {
@@ -505,7 +505,7 @@ async function processAnswers(roomCode) {
       });
     });
 
-    console.log("Transposed Rankings:", transposedRankings);
+    //console.log("Transposed Rankings:", transposedRankings);
 
     const averageRankings = transposedRankings.map((playerRankings) => {
       const sum = playerRankings.reduce((acc, rank) => acc + rank, 0);
@@ -513,7 +513,7 @@ async function processAnswers(roomCode) {
       return average;
     });
 
-    console.log("Average Rankings:", averageRankings);
+    //console.log("Average Rankings:", averageRankings);
 
     const sortedPlayers = averageRankings
       .map((rank, index) => ({ player: players[index], rank }))
@@ -632,7 +632,7 @@ async function bonusPoints(roomCode) {
         player: highestModestyPlayer,
         pointsAwarded: pointsPerAward
       });
-      console.log(`${highestModestyPlayer.name} got ${pointsPerAward} modesty points!`);
+      //console.log(`${highestModestyPlayer.name} got ${pointsPerAward} modesty points!`);
     }
 
     // 3. Find and award top two attributes

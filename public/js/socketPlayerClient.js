@@ -1,4 +1,4 @@
-console.log("connected")
+//console.log("connected")
 
 const backendUrl = window.location.hostname === 'localhost' 
   ? 'http://localhost:5000' 
@@ -10,7 +10,7 @@ const socket = io(backendUrl, {
 });
 
 let gameStarted = false
-console.log(document.cookie)
+//console.log(document.cookie)
 
 const role = 'player';
 const roomCode = window.location.pathname.split('/')[2];
@@ -21,22 +21,22 @@ socket.on("get-playerId", (id)=>{
     playerId = id;
     try {
       localStorage.setItem('userId', id);
-      console.log("Stored playerId: ", id);
+      //console.log("Stored playerId: ", id);
     } catch(e) {
-      console.error("Failed to store playerId:", e);
+      //console.error("Failed to store playerId:", e);
     }
   }
 });
 
 socket.on("reconnected", (savedPlayer, roomCode, currentGameState, currentQuestion, allPlayers) =>{
-  console.log("reconnected", savedPlayer, roomCode, currentGameState, currentQuestion, allPlayers)
+  //console.log("reconnected", savedPlayer, roomCode, currentGameState, currentQuestion, allPlayers)
   playerId = savedPlayer._id;
   playerName = savedPlayer.name;
   if (currentGameState == "join"){
-    console.log("join-phase")
+    //console.log("join-phase")
   }
   else if (currentGameState == "ranking"){
-    console.log(localStorage.getItem('phase-answered'))
+    //console.log(localStorage.getItem('phase-answered'))
     if (localStorage.getItem('phase-answered') == "true"){
       const namePhase = document.getElementById("name-phase");
       namePhase.classList.add("displayNone")
@@ -49,7 +49,7 @@ socket.on("reconnected", (savedPlayer, roomCode, currentGameState, currentQuesti
     }
   }
   else if(currentGameState == "prompt"){
-    console.log(localStorage.getItem('phase-answered'))
+    //console.log(localStorage.getItem('phase-answered'))
     if (localStorage.getItem('phase-answered') == "true"){
       const namePhase = document.getElementById("name-phase");
       namePhase.classList.add("displayNone")
@@ -65,7 +65,7 @@ socket.on("reconnected", (savedPlayer, roomCode, currentGameState, currentQuesti
     localStorage.removeItem('userId');
     localStorage.removeItem("phase-answered")
   }else{
-    console.log("waiting")
+    //console.log("waiting")
   }
 })
 
@@ -76,17 +76,17 @@ socket.on("answer-question", (question, allPlayers)=>{
 })
 
 socket.on("room-access-failed", ()=>{
-  console.log("Room full, or already started")
+  //console.log("Room full, or already started")
   window.location.href = '/';
 })
 
 socket.on("connect", () => {
-  console.log("Connected to Socket.io server with ID:", socket.id);
+  //console.log("Connected to Socket.io server with ID:", socket.id);
 });
 
 window.onload = function() {
   userId = localStorage.getItem('userId');
-  console.log("userId: ", userId) 
+  //console.log("userId: ", userId) 
   if (userId){
     socket.emit('reconnect-player', userId, roomCode)
   }
@@ -98,7 +98,7 @@ socket.on("start-game", ()=>{
 })
 
 socket.on("ranked-results",(rankedResults, roomCode, positive)=>{
-  console.log(rankedResults, roomCode, positive)
+  //console.log(rankedResults, roomCode, positive)
 })
 
 socket.on("end-results",(bonusPointsInfo, sortedPlayers)=>{
@@ -156,7 +156,7 @@ optionButtons.forEach(button => {
       }
     }
 
-    console.log(selectedAttributes);
+    //console.log(selectedAttributes);
   });
 });
 
@@ -167,14 +167,14 @@ goodOrBad.addEventListener("click", ()=>{
     goodOrBad.classList.add("false")
     positive = false;
     goodOrBad.textContent="Bad"
-    console.log(positive)
+    //console.log(positive)
     sendQuestion.classList.add("false")
   }
   else{
     goodOrBad.classList.remove("false")
     positive=true;
     goodOrBad.textContent="Good"
-    console.log(positive)
+    //console.log(positive)
     sendQuestion.classList.remove("false")
   }
 })
@@ -184,7 +184,7 @@ sendQuestion.addEventListener("click", ()=>{
   const input = document.getElementById("question-input");
   if (input.value && selectedAttributes.length == 2){
     socket.emit("player-question", selectedAttributes,positive, input.value, roomCode)
-    console.log(selectedAttributes, positive, input.value, roomCode)
+    //console.log(selectedAttributes, positive, input.value, roomCode)
     const promptPhase = document.getElementById("prompt-phase");
     promptPhase.classList.add("displayNone")
     const waitingDiv = document.querySelector(".waiting")
@@ -383,7 +383,7 @@ document.addEventListener("DOMContentLoaded", () => {
       localStorage.setItem('phase-answered', "true");
     });
   } else {
-    console.log("Submit ranking button not found");
+    //console.log("Submit ranking button not found");
   }
 });
 
