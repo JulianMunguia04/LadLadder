@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="/players.css">
+  <title>Lad Ladder</title>
+</head>
+<body>
+  <main id="main">
+    <img id="logo" src="/gaemtiem-logo.png">
+    <div id="background"></div>
+    <h1 class="join-text">Enter Room Code</h1>
+    <div class="container-join"> 
+      <input class="room-input name-input" id="room-code" type="text" autocomplete="off">
+      <button class="join-button" id="join-button">Join</button>
+    </div>
+  </main>
+  <footer>
+  </footer>
+  <script>
+    const joinGameButton = document.getElementById("join-button");
+    joinGameButton.addEventListener("click", ()=>{
+      const room = document.getElementById("room-code").value; 
+      window.location.href= `/join/${room}`;
+    })
+  </script>
+</body>
+</html>

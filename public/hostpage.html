@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="hostpage.css">
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.2.4/howler.min.js"></script>
+  <script src="./js/hostSocketClient.js" defer></script>
+  <title>Lad Ladder</title>
+</head>
+<body>
+  <div id="join-phase-header" class="display-none">
+    <h1 id="waiting"> Waiting For Players</h1>
+    <div id="join-code">
+      <a id="join-link">Room Code:</a>
+      <div id="room-code">XDWM</div>
+    </div>
+  </div>
+  <header>
+    <img id="curtains" src="./images/curtains.png">
+  </header>
+  <main>
+    <div class="join-phase display-none">
+      <div id="players-join-container">
+
+      </div>
+      <button class="host-controls display-none" id="start-game">Start Game</button>
+      <img id="join-curtains" src="./images/join-curtains.png">
+      <img id="join-stage" src="./images/join-stage.png">
+    </div>
+    <div class="prompting-phase display-none">
+      <img id="prompting-stage" src="./images/stage.png">
+      <h1 id="prompting-guide">Write a Question On Your Own Device:</h1>
+      <div id="prompting-count"></div>
+    </div>
+    <div class="rank-phase display-none">
+      <img id="rank-stage" src="./images/rank-stage.png">
+      <h1 id ="rank-question">Who's The most likely to have a one night stand?</h1>
+      <div id="answers-count"></div>
+    </div>
+    <div id="results-phase" class="display-none">
+      <img id="most-least" src="./images/rank.png">
+      <img id="results-stage" src="./images/stage.png">
+      <h1 id="question-header">
+        <img id="results-stage" src="./images/stage.png">
+      </h1>
+      <div id="players-results-container">
+      </div>
+      <button class="host-controls display-none" id="next-question">Next Question</button>
+    </div>
+    <div id="awards-phase" class="display-none"> 
+    </div>
+    <div id="final-results" class="display-none">
+      <h1 id="final-header">
+        Final Results
+      </h1>
+      <img id="most-least-end" src="./images/rank.png">
+      <div id="final-container">
+
+      </div>
+      <button onclick="window.location.href='/host';" id="new-game" class="display-none" style="margin-top: 2%">New Game</button>
+    </div>
+  </main>
+  <footer>
+    <img id="gaem-tiem-logo" src="gaemtiem-logo.png">
+    <img id="seats" class="diisplay-none" src="./images/seats-footer.png">
+    <img id="rank-seats" class="display-none" src="./images/ranking-seats.png">
+  </footer>
+</body>
+<script>
+  const waiting = document.getElementById("waiting")
+  let waitingFrame = 0;
+  function waitingAnimation() {
+    if (waitingFrame === 0) {
+      waiting.innerText = "Waiting For Players";
+    } else if (waitingFrame === 1) {
+      waiting.innerText = "Waiting For Players.";
+    } else if (waitingFrame === 2) {
+      waiting.innerText = "Waiting For Players..";
+    } else if (waitingFrame === 3) {
+      waiting.innerText = "Waiting For Players...";
+    }
+
+    waitingFrame = (waitingFrame + 1) % 4;
+  }
+  setInterval(waitingAnimation,400)
+
+  async function endGamePhase(bonusPointsInfo, sortedPlayers) {
+  const awardsPhase = document.getElementById("awards-phase");
+  const finalResults = document.getElementById("final-results");
+  const finalContainer = document.getElementById("final-container");
+
+  // Hide final results initially
+  finalResults.classList.add("display-none");
+  
+  // Show awards phase
+  awardsPhase.classList.remove("display-none");
+
+  // Show final results
+  awardsPhase.classList.add("display-none");
+  finalResults.classList.remove("display-none");
+
+  // Display final rankings
+  //finalContainer.innerHTML = '';
+  //ortedPlayers.forEach((player, index) => {
+    //const playerDiv = document.createElement("div");
+    //playerDiv.className = `final-player player-${player.playNumber}`;
+    //playerDiv.innerHTML = `
+      //<h2>${index + 1}. ${player.name}</h2>
+    //  <h3>${player.points} Points</h3>
+    //`;
+   // finalContainer.appendChild(playerDiv);
+ // });
+}
+
+async function resultsPhaseRender(playerDetails){
+  const finalContainer = document.getElementById("final-container")
+  finalContainer.innerHTML = '';
+  const newGame = document.getElementById("new-game")
+  await delay(2500)
+  for (let i = 0; i < 3; i++){
+    console.log(i)
+    const playerDivFlex = document.createElement("div");
+    playerDivFlex.classList.add(`player-container-flex`);
+
+    const playerDiv = document.createElement("div");
+    if (i == 3-1){
+      playerDiv.classList.add(`player-last`);
+      cheerAndQuiet(7000)
+    }
+    else{
+      playerDiv.classList.add(`player`);
+    }
+    playerDiv.classList.add(`player-${playerDetails[i].playerNumber}`);
+    playerDiv.textContent = playerDetails[i].name;
+
+    const playerPoints = document.createElement("h3")
+    if (i== 3-1){
+      playerPoints.classList.add("points-final")
+    }else{
+      playerPoints.classList.add("points")
+    }
+    playerPoints.textContent = `+${(1+i)*100}`
+
+    playerDivFlex.appendChild(playerPoints)
+    playerDivFlex.appendChild(playerDiv)
+
+    finalContainer.appendChild(playerDivFlex);
+    playerRankSound.play()
+    
+    if (i == 3-2){
+      await delay(400)
+      drumRollSound.play()
+      await delay(1000);
+    }else{
+      await delay(500);
+    }
+    
+  }
+  
+  await delay(500);
+  newGame.classList.remove("display-none")
+}
+
+function delay(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+// Test data
+const bonusPointsInfo = {
+  awards: [
+    { attribute: 'morality', player: {playerNumber: 1, name: "Julian"}, pointsAwarded: 100 },
+    { attribute: 'charisma', player: {playerNumber: 2, name: "Roman"}, pointsAwarded: 100 },
+    { attribute: 'modesty', player: {playerNumber: 3, name: "Orest"}, pointsAwarded: 100 }
+  ],
+  totalPointsDistributed: 300,
+  playersCount: 1
+};
+
+const sortedPlayers = [
+  {playerNumber: 1, name: "Julian", points: 100},
+  {playerNumber: 2, name: "Roman", points: 200},
+  {playerNumber: 3, name: "Orest", points: 300}
+];
+
+// Run the awards sequence
+endGamePhase(bonusPointsInfo, sortedPlayers);
+resultsPhaseRender(sortedPlayers)
+const playerRankSound = new Howl({
+  src: ['./sound-effects/negative-ding.mp4'],
+  volume: 0.15
+})
+const drumRollSound = new Howl({
+  src: ['./sound-effects/drum-roll.mp4'],
+  volume: 0.15
+})
+
+async function testSounds(){
+  for (let i = 0; i < 3; i++){
+    await delay(400)
+    playerRankSound.play()
+    
+  }
+}
+
+function cheerAndQuiet(time) {
+  // Play the cheer sound
+  crowdCheerSound.play();
+
+  // After 3 seconds, start lowering the volume
+  setTimeout(() => {
+    const intervalId = setInterval(() => {
+      const currentVol = crowdCheerSound.volume();
+
+      if (currentVol > 0.01) { // Stop lowering volume when it's close to 0
+        const newVol = Math.max(0, currentVol - 0.01);
+        crowdCheerSound.volume(newVol);
+        console.log("quieter", newVol.toFixed(2));
+      } else {
+        // Stop the interval when the volume is at 0
+        clearInterval(intervalId);
+        console.log("sound fully quiet");
+      }
+    }, 100); // Decrease volume every 100ms
+  }, time); // Wait for 3 seconds before starting to quiet down
+}
+
+const crowdCheerSound = new Howl({
+  src: ['./sound-effects/crowd-cheering.mp3'],
+  volume: 0.15,
+})
+
+</script>
+</html>

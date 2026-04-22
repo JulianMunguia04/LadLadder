@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="/hostpage.css">
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.2.4/howler.min.js"></script>
+  <script src="/js/hostSocketClient.js" defer></script>
+  <title>Lad Ladder</title>
+</head>
+<body>
+  <div id="join-phase-header">
+    <h1 id="waiting"> Waiting For Players</h1>
+    <div id="join-code">
+      <a id="join-link" onclick="copyJoinLink()">Room Code:</a>
+      <div id="room-code"><%= roomCode %></div>
+    </div>
+  </div>
+  <header>
+    <img id="curtains" src="/images/curtains.png">
+  </header>
+  <main>
+    <div class="join-phase">
+      <div id="players-join-container">
+
+      </div>
+      <button class="host-controls display-none" id="start-game">Start Game</button>
+      <img id="join-curtains" src="/images/join-curtains.png">
+      <img id="join-stage" src="/images/join-stage.png">
+    </div>
+    <div class="prompting-phase display-none">
+      <img id="prompting-stage" src="/images/stage.png">
+      <h1 id="prompting-guide">Write a Question On Your Own Device:</h1>
+      <div id="prompting-count"></div>
+    </div>
+    <div class="rank-phase display-none">
+      <img id="rank-stage" src="/images/rank-stage.png">
+      <h1 id ="rank-question">Who's The most likely to have a one night stand?</h1>
+      <div id="answers-count"></div>
+    </div>
+    <div id="results-phase" class="display-none">
+      <img id="most-least" src="/images/rank.png">
+      <img id="results-stage" src="/images/stage.png">
+      <h1 id="question-header">
+        <img id="results-stage" src="/images/stage.png">
+      </h1>
+      <div id="players-results-container">
+      </div>
+      <button class="host-controls display-none" id="next-question">Next Question</button>
+    </div>
+    <div id="awards-phase" class="display-none">
+       
+    </div>
+    <div id="final-results" class="display-none">
+      <h1 id="final-header">
+        Final Results
+      </h1>
+      <img id="most-least-end" src="/images/rank.png">
+      <div id="final-container">
+
+      </div>
+      <button onclick="window.location.href='/host';" id="new-game" class="display-none" style="margin-top: 2%">New Game</button>
+    </div>
+  </main>
+  <footer>
+    <img id="gaem-tiem-logo" src="/gaemtiem-logo.png">
+    <img id="seats" class="display-none" src="/images/seats-footer.png">
+    <img id="rank-seats" class="display-none" src="/images/ranking-seats.png">
+  </footer>
+</body>
+<script>
+  const waiting = document.getElementById("waiting")
+  let waitingFrame = 0;
+  function waitingAnimation() {
+    if (waitingFrame === 0) {
+      waiting.innerText = "Waiting For Players";
+    } else if (waitingFrame === 1) {
+      waiting.innerText = "Waiting For Players.";
+    } else if (waitingFrame === 2) {
+      waiting.innerText = "Waiting For Players..";
+    } else if (waitingFrame === 3) {
+      waiting.innerText = "Waiting For Players...";
+    }
+
+    waitingFrame = (waitingFrame + 1) % 4;
+  }
+  setInterval(waitingAnimation,400)
+</script>
+</html>

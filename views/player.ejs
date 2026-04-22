@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="/players.css">
+  <title>Lad Ladder</title>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="/js/socketPlayerClient.js" defer></script>
+</head>
+<body>
+  <main id="main">
+    <img id="logo" src="/gaemtiem-logo.png">
+    <div id="background"></div>
+    <div id="name-phase">
+      <img class="name-logo" src="/images/ladladderlogo.png">
+      <div class="name-container">
+        <input class="name-input" id="playerName" type="text" maxlength="10" placeholder="Name" autocomplete="off">
+        <button class="join-button" id="join-button">Join</button>
+      </div>
+    </div>
+    <div class="waiting displayNone">Waiting For Others...</div>
+    <div id="prompt-phase" class="displayNone">
+      <h1>Write your own Question:</h1>
+      <div class="input-option-flex">
+        <input id = "question-input" maxlength="65" autocomplete="off">
+        <button id="good-or-bad">Good</button>
+      </div>
+      <div id="attribute-options">
+        <button class="options intelligence">Intelligence &#x1F9E0;</button> <!-- 🧠 -->
+        <button class="options morality">Morality &#x1F47C;</button>      <!-- 👼 -->
+        <button class="options charisma">Charisma &#x1F60E;</button>     <!-- 😎 -->
+        <button class="options luck">Luck &#x1F340;</button>            <!-- 🍀 -->
+        <button class="options humor">Humor &#x1F602;</button>          <!-- 😂 -->
+        <button class="options creativity">Creativity &#x1F3A8;</button> <!-- 🎨 -->
+        <button class="options achievement">Achievement &#x1F3C6;</button><!-- 🏆 -->
+        <button class="options attraction">Attraction &#x2764;</button>  <!-- ❤️ -->
+        <button class="options strength">Strength &#x1F4AA;</button>     <!-- 💪 -->
+        <button class="options effort">Effort &#x1F605;</button>
+      </div>
+      <button id="send-question">
+        Submit
+      </button>
+    </div>
+    <div id="rank-phase" class="displayNone">
+      <h1 id="rank-question">Answer The Following Question</h1>
+      <img id="rank-scale" src="/images/rank.png">
+      <div id="ranking-section" class="ranking-section" ondrop="drop(event)" ondragover="allowDrop(event)">
+      </div>
+      <div id="players-container" class="players-list">
+        <!-- This section will be populated dynamically with player data -->
+      </div>
+      <button id="submit-ranking">Submit Ranking</button>
+    </div>
+    <div id="end-game-phase" class="displayNone">
+      <h1>See Final Results On Screen</h1>
+    </div>
+  </main>
+</body>
+</html>
+
